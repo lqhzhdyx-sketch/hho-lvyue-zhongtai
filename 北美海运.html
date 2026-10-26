@@ -1,0 +1,3299 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>北美海运头程</title>
+<style>
+  :root { --bg:#f6f5f4; --ink:#1c1917; --muted:#57534e; --line:#e7e5e4; }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--bg); color:var(--ink); font:15px/1.55 "Segoe UI","Microsoft YaHei",sans-serif; }
+  main { max-width:1100px; margin:0 auto; padding:28px 20px 80px; }
+  h1 { font-size:28px; margin:0 0 6px; }
+  h2 { font-size:20px; margin:32px 0 8px; }
+  h3 { font-size:16px; margin:18px 0 8px; }
+  a { color:#9a3412; }
+  .sub, .cap { color:var(--muted); }
+  nav { position:sticky; top:0; z-index:5; display:flex; flex-wrap:wrap; gap:8px; padding:8px 0 10px; background:#f6f5f4; }
+  nav a { text-decoration:none; color:var(--ink); background:#fff; border:1px solid var(--line); border-radius:999px; padding:6px 12px; font-size:14px; }
+  .panel { background:#fff; border:1px solid var(--line); border-radius:12px; padding:14px 16px; margin:12px 0; }
+  .band { font-size:12px; letter-spacing:.08em; color:#78716c; margin:14px 0 6px; }
+  .node { display:grid; grid-template-columns:42px 1fr; gap:12px; align-items:start; }
+  .num { width:36px; height:36px; border-radius:50%; background:#1c1917; color:#fff; display:flex; align-items:center; justify-content:center; font-weight:700; }
+  .stem { width:2px; height:12px; background:#e7e5e4; margin-left:17px; }
+  .node b { display:block; }
+  .node span { display:block; color:#44403c; margin-top:2px; }
+  table { width:100%; border-collapse:collapse; background:#fff; font-size:13px; }
+  th, td { text-align:left; padding:8px 10px; border-bottom:1px solid var(--line); vertical-align:top; }
+  th { color:var(--muted); font-size:12px; font-weight:600; background:#fafaf9; }
+  .wrap { overflow:auto; }
+  figure { margin:12px 0; }
+  img { max-width:100%; height:auto; border:1px solid var(--line); border-radius:8px; background:#fff; }
+  p { margin:8px 0; }
+  svg.chart { width:100%; max-width:100%; min-width:0; height:auto; display:block; }
+  .chart .ttl { font-size:15px; font-weight:650; fill:#1c2430; font-family:"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif; }
+  .chart .sub { font-size:12px; fill:#5e6b7a; font-family:"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif; }
+  .chart .cap { font-size:12px; fill:#5e6b7a; font-family:"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif; }
+  .chart .tag { font-size:12px; font-weight:700; font-family:"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif; }
+  h2, h3 { scroll-margin-top: 168px; }
+  h2 { padding-top: 14px; border-top: 1px solid var(--line); }
+  .co-lead { color:var(--muted); margin:0 0 10px; }
+  .seg { background:#fff; border:1px solid var(--line); border-radius:12px; padding:10px 14px; margin:0 0 10px; }
+  .seglab { margin:0 0 6px; font-size:12px; font-weight:700; letter-spacing:.08em; color:#9a3412; }
+  .seg ul { margin:0; padding-left:1.2em; }
+  .seg li { margin:4px 0; }
+  .kicker { margin: 36px 0 0; font-size: 12px; font-weight: 700; letter-spacing: .14em; color: #9a3412; }
+  .kicker + h2 { border-top: none; margin-top: 6px; padding-top: 0; }
+  nav { gap: 6px 8px; }
+  nav .navlab { width: 100%; margin: 2px 0 0; font-size: 11px; letter-spacing: .12em; color: #a8a29e; }
+  details { background:#fff; border:1px solid var(--line); border-radius:12px; padding:8px 12px; margin:12px 0; }
+  summary { cursor:pointer; color:var(--muted); font-size:13px; }
+  details figure { margin:8px 0 0; }
+  .mx { width:100%; table-layout:fixed; background:#fff; font-size:12px; line-height:1.45; border:1px solid var(--line); border-radius:12px; overflow:hidden; }
+  .mx th, .mx td { padding:6px 6px; border-bottom:1px solid var(--line); vertical-align:top; word-break:break-word; }
+  .mx thead th { background:#fafaf9; color:var(--muted); font-size:11px; font-weight:600; }
+  .mx .na { color:#a8a29e; }
+  .mx .grp { font-weight:700; border-left:3px solid var(--c,#1c1917); }
+  .mx .grp small { display:block; font-weight:400; color:var(--muted); margin-top:2px; }
+  .mx .ship { font-weight:650; }
+  .mx tr.rec-push td { background:#ecfdf5; }
+  .mx tr.rec-ok td { background:#fffbeb; }
+  .mx tr.rec-care td { background:#fff7ed; }
+  .mx td.rec { font-weight:650; white-space:nowrap; }
+  .mx tr.rec-push td.rec { color:#047857; }
+  .mx tr.rec-ok td.rec { color:#b45309; }
+  .mx tr.rec-care td.rec { color:#c2410c; }
+  .leg { display:flex; flex-wrap:wrap; gap:8px 14px; margin:0 0 10px; font-size:12px; color:var(--muted); }
+  .leg i { display:inline-block; width:10px; height:10px; border-radius:2px; margin-right:4px; vertical-align:middle; }
+  .leg .g { background:#6ee7b7; }
+  .leg .y { background:#fcd34d; }
+  .leg .o { background:#fdba74; }
+  @media (max-width:640px) {
+    main { padding:16px 12px 64px; }
+    h1 { font-size:22px; }
+    nav a { font-size:13px; padding:5px 10px; }
+  }
+
+  .sheets { position:sticky; top:0; z-index:6; display:flex; flex-wrap:wrap; gap:4px; padding:8px 0 10px; background:#f6f5f4; border-bottom:1px solid var(--line); margin:0 0 16px; }
+  .sheets button { appearance:none; border:1px solid var(--line); background:#fff; color:var(--ink); border-radius:8px 8px 0 0; padding:8px 12px; font:14px/1.2 "Segoe UI","Microsoft YaHei",sans-serif; cursor:pointer; }
+  .sheets button.on { background:#1c1917; color:#fff; border-color:#1c1917; }
+  .sheet { display:none; }
+  .sheet.on { display:block; }
+  .sheet > h2:first-child { border-top:none; margin-top:0; padding-top:0; }
+  h2, h3 { scroll-margin-top: 72px; }
+
+  .hho { margin:18px 0 8px; }
+  .hho-note { color:var(--muted); font-size:12px; margin:0 0 8px; }
+  .mx tr.hho-gap td { background:#fafaf9; }
+
+  /* 总览摘要：覆盖度 / 时效色 */
+  :root {
+    --cov-ok:#047857; --cov-ok-bg:#ecfdf5;
+    --cov-mid:#b45309; --cov-mid-bg:#fffbeb;
+    --cov-gap:#b91c1c; --cov-gap-bg:#fef2f2;
+    --ttl-ideal:#047857; --ttl-ideal-bg:#d1fae5;
+    --ttl-common:#1d4ed8; --ttl-common-bg:#dbeafe;
+    --ttl-watch:#b45309; --ttl-watch-bg:#fef3c7;
+    --ttl-bad:#b91c1c; --ttl-bad-bg:#fee2e2;
+  }
+  .lead {
+    background:#fff; border:1px solid var(--line); border-radius:14px;
+    padding:16px 16px 10px; margin:0 0 18px;
+    box-shadow:0 1px 0 rgba(28,25,23,.04);
+  }
+  .lead .lead-kicker {
+    margin:0 0 6px; font-size:11px; font-weight:700; letter-spacing:.14em; color:#9a3412;
+  }
+  .lead h2 { border:0; margin:0 0 8px; padding:0; font-size:18px; }
+  .lead .one-liner { margin:0 0 12px; font-size:14px; color:var(--ink); }
+  .tag {
+    display:inline-block; font-size:11px; font-weight:650; padding:2px 8px;
+    border-radius:999px; white-space:nowrap;
+  }
+  .tag.ok { background:var(--cov-ok-bg); color:var(--cov-ok); }
+  .tag.mid { background:var(--cov-mid-bg); color:var(--cov-mid); }
+  .tag.gap { background:var(--cov-gap-bg); color:var(--cov-gap); }
+  .tag.ideal { background:var(--ttl-ideal-bg); color:var(--ttl-ideal); }
+  .tag.common { background:var(--ttl-common-bg); color:var(--ttl-common); }
+  .tag.watch { background:var(--ttl-watch-bg); color:var(--ttl-watch); }
+  .tag.bad { background:var(--ttl-bad-bg); color:var(--ttl-bad); }
+  .mx tr.cov-ok td:first-child { box-shadow:inset 3px 0 0 var(--cov-ok); }
+  .mx tr.cov-mid td:first-child { box-shadow:inset 3px 0 0 var(--cov-mid); }
+  .mx tr.cov-gap td:first-child { box-shadow:inset 3px 0 0 var(--cov-gap); }
+  .mx td.ideal, .pill-ideal { background:var(--ttl-ideal-bg); color:var(--ttl-ideal); font-weight:650; }
+  .mx td.common, .pill-common { background:var(--ttl-common-bg); color:var(--ttl-common); font-weight:650; }
+  .good-list { margin:8px 0 12px; padding-left:1.2em; }
+  .good-list li { margin:4px 0; }
+  .bar-wrap { margin:10px 0 14px; }
+  .bar-row { display:grid; grid-template-columns:110px 1fr 52px; gap:8px; align-items:center; margin:6px 0; font-size:12px; }
+  .bar-track { height:18px; background:#f5f5f4; border-radius:6px; overflow:hidden; display:flex; }
+  .bar-track span { display:block; height:100%; }
+  .bar-track .b-dom { background:#6ee7b7; }
+  .bar-track .b-sea { background:#93c5fd; }
+  .bar-track .b-wh { background:#fcd34d; }
+  .bar-track.common .b-dom { background:#34d399; }
+  .bar-track.common .b-sea { background:#60a5fa; }
+  .bar-track.common .b-wh { background:#fbbf24; }
+  .src-tag { font-size:10px; color:var(--muted); letter-spacing:.04em; }
+  .leg .ideal { background:#6ee7b7; }
+  .leg .common { background:#60a5fa; }
+  .leg .watch { background:#fcd34d; }
+  .leg .bad { background:#f87171; }
+  .leg .okc { background:#6ee7b7; }
+  .leg .midc { background:#fcd34d; }
+  .leg .gapc { background:#f87171; }
+</style>
+</head>
+<body>
+<main>
+<div class="sheets" role="tablist">
+<button type="button" data-sheet="overview" class="on">总览</button>
+<button type="button" data-sheet="book">订舱</button>
+<button type="button" data-sheet="stuff">做箱</button>
+<button type="button" data-sheet="box">箱型</button>
+<button type="button" data-sheet="pack">装柜</button>
+<button type="button" data-sheet="load">装船</button>
+<button type="button" data-sheet="sea">在途</button>
+<button type="button" data-sheet="dest">清关提货</button>
+<button type="button" data-sheet="wh">拖车与仓库</button>
+<button type="button" data-sheet="west">美西码头</button>
+<button type="button" data-sheet="east">美东码头</button>
+<button type="button" data-sheet="time">时效上架</button>
+<button type="button" data-sheet="terms">名称解析</button>
+<button type="button" data-sheet="risk">风险与应对</button>
+</div>
+<section class="sheet on" id="sheet-overview" data-sheet="overview">
+
+  <h1>北美海运头程</h1>
+  <p class="sub">头程交给计划和仓库的，是一个还能改得动的到仓日。每个节点用同一套字段：锁定什么、认哪个时点、变了当天做什么。</p>
+
+  <div class="lead" id="summary">
+    <p class="lead-kicker">说明</p>
+    <p class="one-liner">延误／甩柜／拥堵压不住，但每一环要当天能感知；ETA 改一天，预约当天改；到港 ≠ 可提 ≠ 可售；柜延误 ≠ 真断货（去掉该柜后 90 天盖不住才升）。</p>
+    <p class="leg" style="margin-top:0"><i class="okc"></i>已控　<i class="midc"></i>半控　<i class="gapc"></i>缺口</p>
+    <div class="wrap">
+    <table class="mx">
+      <thead>
+        <tr><th>节点</th><th>覆盖</th><th>一句话</th></tr>
+      </thead>
+      <tbody>
+        <tr class="cov-ok"><td>订舱 / 船期</td><td><span class="tag ok">已控</span></td><td>认 S/O；变了当天重算交付与预约</td></tr>
+        <tr class="cov-mid"><td>做箱 / 装船</td><td><span class="tag mid">半控</span></td><td>认进港与 ATD；进港≠已装船</td></tr>
+        <tr class="cov-ok"><td>在途</td><td><span class="tag ok">已控</span></td><td>工作日早报盯 ETA；差 1 天进日报</td></tr>
+        <tr class="cov-mid"><td>提柜 / LFD</td><td><span class="tag mid">半控</span></td><td>日报已按 LFD 代理剩≤2 天 P0；码头系统真 LFD 未接入</td></tr>
+        <tr class="cov-mid"><td>送仓 / 上架</td><td><span class="tag mid">半控</span></td><td>约仓按仓按周，不与海运天数相加</td></tr>
+        <tr class="cov-ok"><td>时效标杆</td><td><span class="tag ok">已控</span></td><td>从订舱确认起算；排产用「常见」列</td></tr>
+      </tbody>
+    </table>
+    </div>
+    <p class="cap">细则见下方节点表、「风险与应对」「时效上架」。</p>
+  </div>
+
+  <div class="wrap">
+  <table class="mx">
+    <thead>
+      <tr><th>节点</th><th>锁定什么</th><th>履约认的时点</th><th>变了当天做什么</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>订舱</td>
+        <td>这一水的舱、截港、目的港码头</td>
+        <td>S/O 上的船名、航次、ETD</td>
+        <td>船名或 ETD 变了，计划和预约同一天重算</td>
+      </tr>
+      <tr>
+        <td>做箱</td>
+        <td>截港前重箱进得了场</td>
+        <td>进港。预提和落箱只解决进场</td>
+        <td>截港当天还没进港，当天改下一水</td>
+      </tr>
+      <tr>
+        <td>装柜</td>
+        <td>货、数量、封号在离厂前被确认</td>
+        <td>八步里的书面确认。汇一、持创同一套</td>
+        <td>缺一步确认，司机不走</td>
+      </tr>
+      <tr>
+        <td>装船</td>
+        <td>这只箱上了这一水</td>
+        <td>ATD。进港、放行、比对、装船都还在码头</td>
+        <td>计划离港日还在堆场，这一水交付日作废，改下一水</td>
+      </tr>
+      <tr>
+        <td>在途</td>
+        <td>仓库和 FBA 的窗口还守得住</td>
+        <td>船公司当天的 ETA</td>
+        <td>ETA 改一天，预约当天改</td>
+      </tr>
+      <tr>
+        <td>提货配送</td>
+        <td>可提，并且免费期还没用完</td>
+        <td>码头系统里的最后免费日。已卸还不能提</td>
+        <td>剩 2 天仍不可提或没有预约，当天报</td>
+      </tr>
+      <tr>
+        <td>还空</td>
+        <td>用箱和车架的钟停下来</td>
+        <td>空箱进了当天收这一箱型的地点</td>
+        <td>还空表不收，当天报，不等账单</td>
+      </tr>
+    </tbody>
+  </table>
+  </div>
+
+  
+
+  <h2 id="map">业务大图</h2>
+  <p class="co-lead">三条线：上面单据，中间箱子，下面清关。出口放行卡住装船，进口放行卡住提货。</p>
+  <svg class="chart" width="100%" viewBox="0 0 1000 640" preserveAspectRatio="xMidYMin meet" role="img" aria-label="头程业务流程图">
+    <defs>
+      <marker id="arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 Z" fill="#8b97a6"/></marker>
+      <marker id="arrG" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 Z" fill="#1d6b4a"/></marker>
+    </defs>
+    <rect x="0" y="0" width="1000" height="640" rx="8" fill="#f7f9fb"/>
+    <circle cx="18" cy="22" r="5" fill="#1e4d7b"/><text x="30" y="26" class="cap">单据</text>
+    <circle cx="88" cy="22" r="5" fill="#9a3412"/><text x="100" y="26" class="cap">物动</text>
+    <circle cx="158" cy="22" r="5" fill="#1d6b4a"/><text x="170" y="26" class="cap">清关</text>
+
+    <text x="24" y="58" class="cap">单据 · 凭证从左往右交</text>
+    <rect x="24" y="70" width="220" height="86" rx="8" fill="#fff" stroke="#dbe1e8"/>
+    <rect x="24" y="70" width="220" height="4" fill="#1e4d7b"/>
+    <text x="38" y="98" class="ttl">1　订舱，取得 S/O</text>
+    <text x="38" y="122" class="sub">船名航次、截点、目的港码头</text>
+    <line x1="244" y1="113" x2="276" y2="113" stroke="#8b97a6" stroke-width="1.5" marker-end="url(#arr)"/>
+    <rect x="284" y="70" width="220" height="86" rx="8" fill="#fff" stroke="#dbe1e8"/>
+    <rect x="284" y="70" width="220" height="4" fill="#1e4d7b"/>
+    <text x="298" y="98" class="ttl">2　截单、VGM</text>
+    <text x="298" y="122" class="sub">补料和重量交给船公司</text>
+    <line x1="504" y1="113" x2="536" y2="113" stroke="#8b97a6" stroke-width="1.5" marker-end="url(#arr)"/>
+    <rect x="544" y="70" width="210" height="86" rx="8" fill="#fff" stroke="#dbe1e8"/>
+    <rect x="544" y="70" width="210" height="4" fill="#1e4d7b"/>
+    <text x="558" y="98" class="ttl">3　提单</text>
+    <text x="558" y="122" class="sub">开船后出具，途中看船期</text>
+    <line x1="754" y1="113" x2="786" y2="113" stroke="#8b97a6" stroke-width="1.5" marker-end="url(#arr)"/>
+    <rect x="794" y="70" width="182" height="86" rx="8" fill="#fff" stroke="#dbe1e8"/>
+    <rect x="794" y="70" width="182" height="4" fill="#1e4d7b"/>
+    <text x="808" y="98" class="ttl">4　提货单</text>
+    <text x="808" y="122" class="sub">船公司放货后出闸</text>
+
+    <text x="24" y="196" class="cap">物动 · 箱子从左往右走</text>
+    <rect x="24" y="208" width="176" height="92" rx="8" fill="#fff" stroke="#dbe1e8"/>
+    <rect x="24" y="208" width="176" height="4" fill="#9a3412"/>
+    <text x="36" y="236" class="ttl">做箱</text>
+    <text x="36" y="260" class="sub">提空、装货、上铅封</text>
+    <text x="36" y="280" class="sub">堆场到工厂</text>
+    <line x1="200" y1="254" x2="228" y2="254" stroke="#8b97a6" stroke-width="1.5" marker-end="url(#arr)"/>
+    <rect x="236" y="208" width="176" height="92" rx="8" fill="#fff" stroke="#dbe1e8"/>
+    <rect x="236" y="208" width="176" height="4" fill="#9a3412"/>
+    <text x="248" y="236" class="ttl">进港装船</text>
+    <text x="248" y="260" class="sub">重箱进码头，装船离港</text>
+    <text x="248" y="280" class="sub">先要有出口放行</text>
+    <line x1="412" y1="254" x2="440" y2="254" stroke="#8b97a6" stroke-width="1.5" marker-end="url(#arr)"/>
+    <rect x="448" y="208" width="168" height="92" rx="8" fill="#fff" stroke="#dbe1e8"/>
+    <rect x="448" y="208" width="168" height="4" fill="#9a3412"/>
+    <text x="460" y="236" class="ttl">卸进堆场</text>
+    <text x="460" y="260" class="sub">在途之后靠港</text>
+    <text x="460" y="280" class="sub">柜子落到该码头</text>
+    <line x1="616" y1="254" x2="644" y2="254" stroke="#8b97a6" stroke-width="1.5" marker-end="url(#arr)"/>
+    <rect x="652" y="208" width="156" height="92" rx="8" fill="#fff" stroke="#dbe1e8"/>
+    <rect x="652" y="208" width="156" height="4" fill="#9a3412"/>
+    <text x="664" y="236" class="ttl">提货</text>
+    <text x="664" y="260" class="sub">拖车提出码头</text>
+    <text x="664" y="280" class="sub">先要进口放行</text>
+    <line x1="808" y1="254" x2="836" y2="254" stroke="#8b97a6" stroke-width="1.5" marker-end="url(#arr)"/>
+    <rect x="844" y="208" width="132" height="92" rx="8" fill="#fff" stroke="#dbe1e8"/>
+    <rect x="844" y="208" width="132" height="4" fill="#9a3412"/>
+    <text x="856" y="236" class="ttl">配送</text>
+    <text x="856" y="260" class="sub">送到指定地点</text>
+    <text x="856" y="280" class="sub">提货之后</text>
+
+    <text x="24" y="348" class="cap">清关 · 单独两条，箭头指回它卡住的那一步</text>
+    <path d="M174 372 C174 336, 324 336, 324 304" fill="none" stroke="#1d6b4a" stroke-width="1.5" marker-end="url(#arrG)"/>
+    <path d="M670 372 C670 336, 730 336, 730 304" fill="none" stroke="#1d6b4a" stroke-width="1.5" marker-end="url(#arrG)"/>
+
+    <rect x="24" y="372" width="300" height="100" rx="8" fill="#eef6f1" stroke="#1d6b4a"/>
+    <text x="38" y="402" class="ttl">出口清关</text>
+    <text x="38" y="426" class="sub">预录，等运抵，海关放行</text>
+    <text x="38" y="448" class="sub">装船前另交 ISF、AMS</text>
+    <rect x="520" y="372" width="300" height="100" rx="8" fill="#eef6f1" stroke="#1d6b4a"/>
+    <text x="534" y="402" class="ttl">进口清关</text>
+    <text x="534" y="426" class="sub">进口申报，拿到放行</text>
+    <text x="534" y="448" class="sub">这里不提柜</text>
+
+    <rect x="24" y="508" width="952" height="108" rx="8" fill="#fff" stroke="#dbe1e8"/>
+    <text x="40" y="540" class="ttl">怎么读这张图</text>
+    <text x="40" y="566" class="sub">单据和箱子各走各的，在装船、提货两处汇合。</text>
+    <text x="40" y="588" class="sub">装船要同时有：重箱已进港、截单和 VGM 已交、出口已放行。</text>
+    <text x="40" y="610" class="sub">提货要同时有：已卸进堆场、进口放行、船公司放货、码头预约。配送在提货之后。</text>
+  </svg>
+  <p class="cap">进场看截港，海关放行看截关。两件事不是同一个时点。</p>
+
+  <h3 class="hho">HHO 视角</h3>
+  <p class="hho-note">关注点：这一环出问题能不能当天感知；会不会把「柜延误」说成「已经断货」；ETA / 预约 / 可售有没有拆开。知识库：履约看板异常闭环、FBA 预约与库存风险、头程提前感知。</p>
+  <div class="wrap">
+  <table class="mx">
+    <thead>
+      <tr><th>潜在风险</th><th>应该怎么应对</th><th>目前怎么应对</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>整条链只看「货在哪」，不知道今天催哪几柜、会不会断货</td><td>首页优先异常清单：柜号×SKU×目的仓×偏差×负责人×下一步；到港≠可售</td><td>履约看板 / 日报有在途与延误；异常闭环字段仍靠人工拼，不是每柜都有责任人和期限</td></tr>
+      <tr><td>把柜延误直接写成真断货，或反过来漏掉边际断货</td><td>先看「含该柜够不够」；只有去掉该柜后 90 天盖不住、去掉前盖得住，才升真断货风险</td><td>计划口径已写清；日报是否逐柜按边际规则标，仍要对照当日推送验收</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+</section>
+<section class="sheet" id="sheet-book" data-sheet="book">
+<h2 id="book">订舱</h2>
+  <h3 id="lines">船公司与航线</h3>
+  <p class="co-lead">同一套字段：分组、船公司、产品、开船、航程、码头、用法。上海、宁波的天数在下一张，换季以这一水 S/O 为准。</p>
+  <div class="wrap">
+  <table class="mx">
+    <colgroup>
+      <col style="width:11%"><col style="width:12%"><col style="width:16%"><col style="width:14%"><col style="width:14%"><col style="width:9%"><col style="width:24%">
+    </colgroup>
+    <thead>
+      <tr><th>分组</th><th>船公司</th><th>产品</th><th>开船</th><th>航程</th><th>码头</th><th>用法</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="grp" rowspan="2" style="--c:#1e4d7b">Gemini<small>2025-01 起</small></td>
+        <td class="ship">马士基<br>MSK</td>
+        <td>TP8、TP7</td><td class="na">—</td><td>见下表</td><td class="na">—</td>
+        <td>上海订 TP8，宁波订 TP7。到洛杉矶约 14 天，周班</td>
+      </tr>
+      <tr>
+        <td class="ship">赫伯罗特<br>HPL</td>
+        <td>WC2、WC5</td><td class="na">—</td><td>见下表</td><td class="na">—</td>
+        <td>WC2 对 TP8，WC5 对 TP7。订到的是同一组船期</td>
+      </tr>
+      <tr>
+        <td class="grp" rowspan="3" style="--c:#0f766e">地中海<small>单独运营</small></td>
+        <td class="ship" rowspan="3">MSC</td>
+        <td>美西南</td><td class="na">—</td><td>7 条<br>洛杉矶、长滩</td><td class="na">—</td>
+        <td>订 Orient。上海到长滩 15 天，宁波 16 天</td>
+      </tr>
+      <tr>
+        <td>美西北</td><td class="na">—</td><td>4 条</td><td class="na">—</td>
+        <td>订 Chinook。上海到西雅图约 16 天，宁波约 18 天</td>
+      </tr>
+      <tr>
+        <td>美东</td><td class="na">—</td><td>5 条</td><td class="na">—</td>
+        <td>条数不能当船期。订之前要到具体航线名</td>
+      </tr>
+      <tr>
+        <td class="grp" style="--c:#6d28d9">以星<small>非联盟成员</small></td>
+        <td class="ship">ZIM</td>
+        <td>ZEX<br>ZX2</td>
+        <td>盐田周三<br>ZX2 见用法</td>
+        <td>ZEX 约 12 天</td>
+        <td>ZEX→ITS<br>ZX2→TraPac</td>
+        <td>盐田 ZEX 卸长滩 ITS。上海、宁波的 ZX2 卸洛杉矶 TraPac</td>
+      </tr>
+      <tr>
+        <td class="grp" rowspan="4" style="--c:#1d6b4a">海洋联盟</td>
+        <td class="ship">中远<br>COSCO</td>
+        <td>CEN、AAC、AAC4</td>
+        <td>上海、宁波<br>一周两班</td>
+        <td>见下表</td><td class="na">—</td>
+        <td>上海、宁波用这三条。SEA、SEA3 从华南开</td>
+      </tr>
+      <tr>
+        <td class="ship">达飞<br>CMA</td>
+        <td>EXX<br>鹰航快线</td>
+        <td>宁波周三<br>上海周四</td>
+        <td>洛杉矶<br>12 天 / 11 天</td>
+        <td>Fenix</td>
+        <td>上海 11 天、宁波 12 天。优先靠泊是产品说法，提柜看当周闸口。另有美西南 11 条、美西北 4 条、美东 6 条</td>
+      </tr>
+      <tr>
+        <td class="ship">长荣<br>EMC</td>
+        <td>HTW<br>盐田快船</td>
+        <td>盐田周一</td>
+        <td>洛杉矶 14 天</td>
+        <td>Everport</td>
+        <td>盐田卸 Everport。上海、宁波订 CPS</td>
+      </tr>
+      <tr>
+        <td class="ship">东方海外<br>OOCL</td>
+        <td>AAC4</td><td class="na">—</td><td>见下表</td>
+        <td>LBCT</td>
+        <td>上海到长滩 13 天，宁波 15 天。先挂宁波，所以上海更快</td>
+      </tr>
+      <tr>
+        <td class="grp" style="--c:#9a3412">Premier<small>2025-02 起</small></td>
+        <td class="ship">ONE<br>HMM<br>阳明</td>
+        <td>PS4、PS6、PS8、PN3、EC1</td>
+        <td class="na">—</td><td>公告未写天数</td>
+        <td>PS8→ITS</td>
+        <td>三家共舱。上海直达 PS4，两港都挂 PS6，宁波美西南 PS8。PS8 从 2026-09-03 起卸长滩 ITS</td>
+      </tr>
+      <tr>
+        <td class="grp" rowspan="3" style="--c:#b45309">美森<small>独立运营</small></td>
+        <td class="ship" rowspan="3">MATSON</td>
+        <td>CLX</td>
+        <td>宁波周二<br>上海周三</td>
+        <td>长滩<br>13 天 / 11 天</td>
+        <td>Pier C</td>
+        <td>工作日到港次日可提。周末闸口关，顺延到下一个工作日。宁波另有示意图约 10 天，以 S/O 为准</td>
+      </tr>
+      <tr>
+        <td>CLX+</td>
+        <td>宁波周三<br>上海周四</td>
+        <td>长滩<br>13 天 / 11 天</td>
+        <td>以 S/O 为准</td>
+        <td>2026 年 10 月长滩船期没有单独这一条。若仍在售，卸哪一家看该水 S/O</td>
+      </tr>
+      <tr>
+        <td>CCX</td>
+        <td>宁波周二<br>上海周四</td>
+        <td>奥克兰<br>14 天 / 12 天</td>
+        <td>奥克兰专用</td>
+        <td>每 5 周 3 班。仓在长滩、洛杉矶订 CLX</td>
+      </tr>
+    </tbody>
+  </table>
+  </div>
+  <h3 id="routes">上海、宁波 → 美国</h3>
+  <p class="co-lead">一般直航：<span class="src-tag">观察·2026-10 跟踪</span> 上海→洛杉矶中位约 15 天，宁波→洛杉矶约 14 天；<span class="src-tag">产品宣传</span> 快船可到 11–13 天。美东更长，Gemini 公布上海→纽约约 33 天、宁波→纽约约 38 天。同一产品若表内与示意图天数不一致（如美森），以这一水 S/O 为准。不挂这个港写「不挂」。</p>
+  <div class="wrap">
+  <table class="mx">
+    <colgroup>
+      <col style="width:22%"><col style="width:24%"><col style="width:27%"><col style="width:27%">
+    </colgroup>
+    <thead>
+      <tr><th>航线</th><th>船公司</th><th>上海出发</th><th>宁波出发</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>EXX<br>鹰航快线</td>
+        <td>达飞</td>
+        <td>洛杉矶 11 天<br>Fenix</td>
+        <td>洛杉矶 12 天<br>Fenix</td>
+      </tr>
+      <tr>
+        <td>CLX</td>
+        <td>美森</td>
+        <td>长滩 10 天到港<br>第 11 天可提</td>
+        <td>长滩约 10 天<br>表上写 13 天</td>
+      </tr>
+      <tr>
+        <td>ZX2<br>华中快线</td>
+        <td>以星</td>
+        <td>挂上海<br>天数未单列</td>
+        <td>洛杉矶 12.5 天</td>
+      </tr>
+      <tr>
+        <td>TP8 / WC2</td>
+        <td>马士基<br>赫伯罗特</td>
+        <td>洛杉矶 14 天</td>
+        <td class="na">不挂</td>
+      </tr>
+      <tr>
+        <td>TP7 / WC5</td>
+        <td>马士基<br>赫伯罗特</td>
+        <td class="na">不挂</td>
+        <td>洛杉矶 14 天</td>
+      </tr>
+      <tr>
+        <td>CEN</td>
+        <td>中远</td>
+        <td>长滩 16 天<br>鲁珀特王子港 11 天</td>
+        <td class="na">不挂</td>
+      </tr>
+      <tr>
+        <td>AAC</td>
+        <td>中远</td>
+        <td>长滩 14 天<br>西雅图 22 天</td>
+        <td>长滩 13 天<br>西雅图 21 天</td>
+      </tr>
+      <tr>
+        <td>AAC2</td>
+        <td>达飞、长荣共舱<br>中远一览</td>
+        <td>长滩 14 天<br>奥克兰 19 天</td>
+        <td>长滩 12 天<br>奥克兰 17 天</td>
+      </tr>
+      <tr>
+        <td>AAC3</td>
+        <td>中远、万海、太平</td>
+        <td>长滩 14 天</td>
+        <td>长滩 13 天</td>
+      </tr>
+      <tr>
+        <td>AAC4</td>
+        <td>东方海外</td>
+        <td>长滩 13 天<br>LBCT</td>
+        <td>长滩 15 天<br>LBCT</td>
+      </tr>
+      <tr>
+        <td>Orient</td>
+        <td>地中海</td>
+        <td>长滩 15 天<br>奥克兰 21 天</td>
+        <td>长滩 16 天<br>奥克兰 23 天</td>
+      </tr>
+      <tr>
+        <td>CPS</td>
+        <td>长荣</td>
+        <td>洛杉矶 17 天<br>奥克兰 26 天</td>
+        <td>洛杉矶 15 天<br>奥克兰 24 天</td>
+      </tr>
+      <tr>
+        <td>PS4</td>
+        <td>海洋网联<br>Premier 共舱</td>
+        <td>直挂洛杉矶 / 长滩<br>天数未公布</td>
+        <td class="na">不挂</td>
+      </tr>
+      <tr>
+        <td>PS6</td>
+        <td>海洋网联<br>Premier 共舱</td>
+        <td>经光阳、釜山到洛杉矶<br>天数未公布</td>
+        <td>上海之后挂宁波<br>天数未公布</td>
+      </tr>
+      <tr>
+        <td>PS8</td>
+        <td>海洋网联<br>Premier 共舱</td>
+        <td class="na">不挂</td>
+        <td>青岛之后到洛杉矶<br>天数未公布</td>
+      </tr>
+      <tr>
+        <td>PN3</td>
+        <td>海洋网联<br>Premier 共舱</td>
+        <td>经釜山到温哥华、塔科马<br>天数未公布</td>
+        <td>青岛之后、上海之前<br>天数未公布</td>
+      </tr>
+      <tr>
+        <td>EC1</td>
+        <td>海洋网联<br>Premier 共舱</td>
+        <td>经釜山到纽约<br>天数未公布</td>
+        <td>上海之后挂宁波<br>天数未公布</td>
+      </tr>
+    </tbody>
+  </table>
+  </div>
+  <p class="cap">SEA、SEA3、ZEX、HTW 不从上海、宁波开。SEA、SEA3 走华南，ZEX 卸长滩 ITS，长荣 HTW 走盐田。AAC2 在 2026 年海洋联盟新产品里改为卸洛杉矶，上表 12 天、14 天仍是中远一览里到长滩的天数。美森宁波：产品行写 13 天，这一行示意图约 10 天，两个数都留着，订这一水以 S/O 为准。</p>
+  <figure>
+    <svg class="chart" width="100%" viewBox="0 0 960 560" preserveAspectRatio="xMidYMin meet" role="img" aria-label="上海宁波到美国船公司航线示意图">
+      <defs>
+        <marker id="rtArr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 Z" fill="#8b97a6"/></marker>
+      </defs>
+      <rect x="0" y="0" width="960" height="560" rx="8" fill="#f7f9fb"/>
+      <text x="24" y="28" class="ttl">上海、宁波 → 美国</text>
+      <text x="24" y="48" class="cap">线色＝建议：绿推进 · 黄可用 · 橙慎选（看码头自动化和闸口，不是运价）</text>
+      <rect x="24" y="58" width="10" height="10" rx="2" fill="#059669"/><text x="40" y="67" class="cap">建议推进</text>
+      <rect x="120" y="58" width="10" height="10" rx="2" fill="#d97706"/><text x="136" y="67" class="cap">可用</text>
+      <rect x="180" y="58" width="10" height="10" rx="2" fill="#ea580c"/><text x="196" y="67" class="cap">慎选</text>
+
+      <rect x="24" y="86" width="130" height="58" rx="8" fill="#fff" stroke="#dbe1e8"/>
+      <rect x="24" y="86" width="130" height="4" fill="#1e4d7b"/>
+      <text x="40" y="114" class="ttl">上海</text>
+      <text x="40" y="132" class="sub">CNSHA</text>
+
+      <rect x="24" y="168" width="130" height="58" rx="8" fill="#fff" stroke="#dbe1e8"/>
+      <rect x="24" y="168" width="130" height="4" fill="#1e4d7b"/>
+      <text x="40" y="196" class="ttl">宁波</text>
+      <text x="40" y="214" class="sub">CNNGB</text>
+
+      <text x="190" y="96" class="cap">美西</text>
+      <path d="M154 110 C 260 70, 400 70, 540 118" fill="none" stroke="#d97706" stroke-width="2.2" marker-end="url(#rtArr)"/>
+      <text x="250" y="66" class="ttl" fill="#d97706">达飞</text>
+      <text x="300" y="66" class="cap">（EXX）→ Fenix · 可用</text>
+
+      <path d="M154 122 C 280 98, 400 98, 540 150" fill="none" stroke="#ea580c" stroke-width="2.4" marker-end="url(#rtArr)"/>
+      <text x="250" y="96" class="ttl" fill="#ea580c">美森</text>
+      <text x="300" y="96" class="cap">（CLX）→ Pier C · 慎选（快但周末关）</text>
+
+      <path d="M154 190 C 280 150, 400 150, 540 178" fill="none" stroke="#d97706" stroke-width="2.2" marker-end="url(#rtArr)"/>
+      <text x="250" y="148" class="ttl" fill="#d97706">地中海</text>
+      <text x="316" y="148" class="cap">（Orient）→ TTI · 可用</text>
+
+      <path d="M154 204 C 290 204, 400 204, 540 210" fill="none" stroke="#059669" stroke-width="2.6" marker-end="url(#rtArr)"/>
+      <text x="250" y="198" class="ttl" fill="#059669">中远 · 东方海外</text>
+      <text x="410" y="198" class="cap">（AAC4）→ LBCT · 建议推进</text>
+
+      <path d="M154 218 C 280 250, 400 258, 540 255" fill="none" stroke="#059669" stroke-width="2.6" marker-end="url(#rtArr)"/>
+      <text x="250" y="252" class="ttl" fill="#059669">马士基 · 赫伯罗特</text>
+      <text x="420" y="252" class="cap">（TP8/TP7）→ APM · 建议推进</text>
+
+      <path d="M154 136 C 300 280, 400 290, 540 292" fill="none" stroke="#059669" stroke-width="2.6" marker-end="url(#rtArr)"/>
+      <text x="250" y="290" class="ttl" fill="#059669">以星</text>
+      <text x="300" y="290" class="cap">（ZX2）→ TraPac · 建议推进</text>
+
+      <rect x="540" y="96" width="176" height="48" rx="8" fill="#ecfdf5" stroke="#6ee7b7"/>
+      <text x="554" y="118" class="ttl">洛杉矶 APM</text>
+      <text x="554" y="134" class="sub">建议 · 自动化高</text>
+      <rect x="540" y="154" width="176" height="48" rx="8" fill="#ecfdf5" stroke="#6ee7b7"/>
+      <text x="554" y="176" class="ttl">长滩 LBCT</text>
+      <text x="554" y="192" class="sub">建议 · AAC4 等</text>
+      <rect x="540" y="212" width="176" height="48" rx="8" fill="#ecfdf5" stroke="#6ee7b7"/>
+      <text x="554" y="234" class="ttl">洛杉矶 TraPac</text>
+      <text x="554" y="250" class="sub">建议 · ZX2 / Premier</text>
+      <rect x="540" y="270" width="176" height="40" rx="8" fill="#fff7ed" stroke="#fdba74"/>
+      <text x="554" y="296" class="ttl">长滩 Pier C</text>
+      <text x="650" y="296" class="cap">慎选</text>
+
+      <text x="190" y="350" class="cap">美东</text>
+      <path d="M154 148 C 320 318, 420 336, 540 340" fill="none" stroke="#059669" stroke-width="2.4" marker-end="url(#rtArr)"/>
+      <text x="250" y="328" class="ttl" fill="#059669">马士基 · 赫伯罗特</text>
+      <text x="420" y="328" class="cap">（Gemini）→ APM · 建议推进</text>
+      <path d="M154 160 C 320 350, 450 372, 540 378" fill="none" stroke="#d97706" stroke-width="2" stroke-dasharray="6 4" marker-end="url(#rtArr)"/>
+      <text x="250" y="368" class="ttl" fill="#d97706">ONE · Premier</text>
+      <text x="390" y="368" class="cap">（EC1）→ 认 S/O · 可用</text>
+      <rect x="540" y="320" width="176" height="40" rx="8" fill="#ecfdf5" stroke="#6ee7b7"/>
+      <text x="554" y="344" class="ttl">APM Elizabeth</text>
+      <text x="670" y="344" class="cap">建议</text>
+      <rect x="540" y="368" width="176" height="40" rx="8" fill="#fffbeb" stroke="#fcd34d"/>
+      <text x="554" y="386" class="ttl">认 S/O 码头</text>
+      <text x="554" y="400" class="sub">Maher / Port Liberty 等</text>
+
+      <text x="190" y="430" class="cap">华南开 · 不从上海宁波订</text>
+      <rect x="190" y="444" width="526" height="72" rx="8" fill="#fff" stroke="#dbe1e8"/>
+      <text x="206" y="470" class="ttl" fill="#d97706">以星</text>
+      <text x="256" y="470" class="cap">（ZEX）→ ITS · 可用</text>
+      <text x="206" y="494" class="ttl" fill="#d97706">长荣</text>
+      <text x="256" y="494" class="cap">（HTW）→ Everport · 可用</text>
+      <text x="430" y="494" class="ttl" fill="#059669">中远</text>
+      <text x="480" y="494" class="cap">（SEA/SEA3）→ LBCT · 建议</text>
+
+      <text x="740" y="112" class="cap">推进优先看</text>
+      <text x="740" y="134" class="sub">APM / LBCT / TraPac</text>
+      <text x="740" y="154" class="sub">TP7·TP8 · AAC4 · ZX2</text>
+      <text x="740" y="186" class="cap">慎选推进</text>
+      <text x="740" y="208" class="sub">美森 CLX → Pier C</text>
+      <text x="740" y="228" class="sub">航程快，周末难提</text>
+    </svg>
+    <figcaption class="cap">绿线建议推进，黄线可用，橙线慎选。依据是目的港自动化和闸口，明细在「美西码头」「美东码头」sheet。</figcaption>
+  </figure>
+  <div class="panel">
+    <p>船期通常更早就能查到，公布后仍会改。建议在开船前约 30 天完成订舱。<strong>30 天是「尽早占舱」的提前量</strong>，不是「确认后天数」。确认舱位之后到离港，理想冲刺可压到约 7 天（优秀值，见时效页）；日常更常见约 14–21 天。起运港、目的港以这一水船期为准。</p>
+    <p>订舱时同时确认这一水停靠的目的港码头：专属码头还是公共码头，决定港后周末能否提柜、要不要预约。</p>
+  </div>
+
+  <h3>怎么判断淡旺季</h3>
+  <div class="panel">
+    <p>1、通过上海航运交易所 <a href="https://www.sse.net.cn/home">https://www.sse.net.cn/home</a> 参考各种指数数据。</p>
+    <p>上海出口集装箱运价指数看的是价格，不能单凭它倒推货量和运力。挂靠数减少，常常是船公司主动抽船，货不多也会少挂靠。舱位紧不紧要三样一起看：运价在涨、准班率变差、货代反馈这一水订不到。</p>
+    <p>2、与货代核对这一水是否超售。货代能感觉到舱位松紧，用来印证上面三项，不能单独当成结论。</p>
+  </div>
+  <details>
+    <summary>运价指数、挂靠原图</summary>
+    <figure>
+      <img src="北美海运_img/0_1_r45.png" alt="表内运价指数图">
+      <figcaption class="cap">表内原图。</figcaption>
+    </figure>
+    <figure>
+      <img src="北美海运_img/0_2_r45.png" alt="表内挂靠与准班图">
+      <figcaption class="cap">表内原图。</figcaption>
+    </figure>
+  </details>
+  <h3>时间窗口</h3>
+  <div class="panel">
+    <p>相对计划离港 ETD。表内写明：是港口和船公司的常见做法，不是法律规定。每一水以 S/O 上的截点为准。</p>
+    <p>1、航线班期：通常提前 4–8 周能看到挂哪些港、周几有船，换季会更早。没有「必须提前多少天定死航线」的规定。</p>
+    <p>2、这一水的船名、航次、ETD：开船前 2–4 周比较能用，之后仍可能换船、跳港或取消这一水。</p>
+    <p>3、一代（自己有船公司约价）订舱：航次在船公司系统打开后就能订，常见是 ETD 前 3–4 周。旺季要更早占舱，订了仍可能甩。</p>
+    <p>4、二手货代（自己没有约价，向一代或同行买舱）：通常更晚才给得稳，常见 ETD 前 7–14 天；舱紧时可能只剩 3–7 天，而且更容易被甩。二代的截单比船公司再早约半天到 1 天，因为资料还要转交一代。</p>
+    <p>5、开港：码头开始收重箱，常见 ETD 前 5–7 天，以这一水公布的开港时间为准。开港前不能进港。</p>
+    <p>6、提空柜、工厂装配：平季安排在截港前 1–2 天完成；工厂离港远，再提前 1 天。旺季预提是把提空提前 2–3 天，空箱免费期通常还没用完，重箱仍然必须在截港前进港。不要提前一周把空箱提出来。</p>
+    <p>7、截单、VGM、截关、截港：常见落在 ETD 前 1–3 天，小时以 S/O 为准。查验可能再占 1–2 天，不要卡在截港当天才进港。</p>
+    <p>8、申报不在上船之后。报关可以在进港前预录；海关放行要等进港后的运抵回执，并且必须在装船之前。去美国的 ISF，以及船公司或一代的 AMS 舱单，都要在装船前至少 24 小时提交。</p>
+    <p>9、装船在放行之后、离港之前，可以是离港前一天或当天。实际离港看 ATD，不看 ETD。</p>
+  </div>
+
+  <h3 class="hho">HHO 视角</h3>
+  <p class="hho-note">关注点：这一环出问题能不能当天感知；会不会把「柜延误」说成「已经断货」；ETA / 预约 / 可售有没有拆开。知识库：履约看板异常闭环、FBA 预约与库存风险、头程提前感知。</p>
+  <div class="wrap">
+  <table class="mx">
+    <thead>
+      <tr><th>潜在风险</th><th>应该怎么应对</th><th>目前怎么应对</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>甩柜 / 改船 / 改码头，计划交付日还按旧 S/O</td><td>确认单核对船名航次 ETD 码头截点；变了当天重算交付和预约；书面保舱才算保舱</td><td>履约中台爬宁波未来船期；某一柜变了仍要人当天改计划，不自动改交付日</td></tr>
+      <tr><td>只看运价，漏掉抽船、准班、订不订得到</td><td>运价、准班、舱位三样一起看；挂靠变少当抽船信号</td><td>订舱表有产品与码头对照；淡旺季判断仍靠货代+船期密度，没有自动评分</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+</section>
+<section class="sheet" id="sheet-stuff" data-sheet="stuff">
+<h2 id="stuff">做箱</h2>
+  <p class="co-lead">做箱是把空箱提出来、拉到工厂装货、封好，再把重箱送进码头。它用的是订舱之后的放箱单，不检查这条船最后装不装得下。</p>
+  <figure>
+    <img src="北美海运_img/0_0_r69.png" alt="表内做箱顺序图">
+    <figcaption class="cap">表内顺序图。下面按同一步骤写能做和不能做的时点。</figcaption>
+  </figure>
+  <div class="wrap">
+  <table class="mx">
+    <colgroup>
+      <col style="width:8%"><col style="width:22%"><col style="width:35%"><col style="width:35%">
+    </colgroup>
+    <thead>
+      <tr><th>步</th><th>动作</th><th>做什么</th><th>时点</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>1</td>
+        <td>放箱</td>
+        <td>船公司或堆场按 S/O 放出空箱，给出提箱堆场和箱型</td>
+        <td>订舱放箱之后。不等开港</td>
+      </tr>
+      <tr>
+        <td>2</td>
+        <td>打单</td>
+        <td>换设备交接单 EIR。提空、还重都要这张单</td>
+        <td>放箱之后</td>
+      </tr>
+      <tr>
+        <td>3</td>
+        <td>提空验箱</td>
+        <td>到指定堆场提空箱。看破洞、变形、气味、箱门、内高。不合格当场换，或先修再去工厂</td>
+        <td>开港前就可以。免费用箱从提空当天起算</td>
+      </tr>
+      <tr>
+        <td>4</td>
+        <td>工厂装货</td>
+        <td>装箱、过磅、上铅封。厂内八步确认见「装柜」。铅封号要和后来的舱单一致</td>
+        <td>开港前就可以。安排在截港前 1–2 天完成；工厂远，再早 1 天</td>
+      </tr>
+      <tr>
+        <td>5</td>
+        <td>重箱进港</td>
+        <td>重箱送进这一水的码头。进门后才有运抵，海关放行要等运抵</td>
+        <td>开港之后、截港之前。开港前进不去</td>
+      </tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h3>开港前能不能做</h3>
+  <div class="wrap">
+  <table class="mx">
+    <thead>
+      <tr><th>动作</th><th>开港前</th><th>开港后到截港</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>提空、验箱、装货、封箱</td>
+        <td>可以</td>
+        <td>可以</td>
+      </tr>
+      <tr>
+        <td>重箱进码头</td>
+        <td>不可以。闸口不收这一水的重箱</td>
+        <td>可以。过了截港，这一水进不去</td>
+      </tr>
+    </tbody>
+  </table>
+  </div>
+  <p class="cap">开港是码头开始收这一水的重箱，常见在 ETD 前 5–7 天。截港常见在 ETD 前 1–3 天。小时以这一水 S/O 为准。做早了的重箱只能落在工厂或外面堆场，等到开港再进。</p>
+
+  <h3>超售了为什么还能做箱</h3>
+  <div class="panel">
+    <p>超售是舱位卖多了，不是放箱系统把空箱停掉。订舱成功就有 S/O，堆场按 S/O 放空箱。提空、装货、进港走的是单证和闸口，不核对这条船还剩多少物理舱位。</p>
+    <p>甩柜发生在后面。船公司配载时按运价、货量和有没有赶上截港挑选，装不下的柜子改下一水。所以箱子可以做完，甚至已经进港，仍然上不了这一水。</p>
+    <p>甩了之后，拖车费和工厂装柜费已经发生。改配下一水时，重箱继续占着免费用箱天数和码头免费期，超了就按天收超期用箱和堆存。</p>
+  </div>
+
+  <h3>预提要不要钱</h3>
+  <div class="panel">
+    <p>预提是在计划装柜日之前把空箱提出来，落在工厂或外面堆场。开港前就可以预提。旺季可以用它锁定好箱子和车，让工厂按自己的时间装完，重箱赶得上截港。</p>
+    <p>它保住的是做得出箱、进得了港。船公司超售之后仍可能甩柜，预提改不了配载。甩到下一水，用箱天数继续算到真正装上船那天。</p>
+  </div>
+  <div class="wrap">
+  <table class="mx">
+    <thead>
+      <tr><th>费用</th><th>公布价</th><th>怎么算</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>超期用箱</td>
+        <td>马士基华东（含上海、宁波）40HQ：前 7 天免费；第 8–15 天 200 元/天；第 16–20 天 500 元/天；第 21 天起 750 元/天。民生出口 40HQ：前 7 天免费；第 8–15 天 140 元/天</td>
+        <td>提空当天起，到装上船当天止，含周末。约价客户的免费期可以更长。退关不享受免费期</td>
+      </tr>
+      <tr>
+        <td>落箱</td>
+        <td>上海港外堆场 2025 年 8 月的一次调价：20 尺 300 元/次，40 尺 500 元/次，45 尺 600 元/次。宁波按各堆场自己的价</td>
+        <td>开港前已经装完，车不能一直背着，吊到港外堆场等开港</td>
+      </tr>
+      <tr>
+        <td>拖车、压车</td>
+        <td>没有统一价目</td>
+        <td>多跑一趟，或车在工厂过夜。订车时向车队要这一票的价</td>
+      </tr>
+    </tbody>
+  </table>
+  </div>
+  <div class="panel">
+    <p>一只 40HQ 走马士基，提空后 7 个日历天内装上船，超期用箱是 0。多占 3 天是 200×3＝600 元。拖到第 16 天，当天变成 500 元。</p>
+    <p>旺季建议只提前 2–3 天提空。这段通常还在 7 天免费期里，超期用箱可以是 0。开港前必须落箱的，上海大柜按下面的市场参考，平时大约 500–600 元，场满大约 700–900 元。提前一周提空，免费期在进港前就会用完。截港前 1–2 天能装完并进港的，不必预提。</p>
+  </div>
+
+  <h3>市场参考</h3>
+  <p class="cap">公布价是价目表。下面是报道和公开价表里出现过的挂牌或报价，随当天堆场饱和度、车况改。同一天两家可以差一截。本公司协议价以车队、堆场当日报价为准。</p>
+  <div class="wrap">
+  <table class="mx">
+    <thead>
+      <tr><th>项目</th><th>市场参考</th><th>看到的场合</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>落箱，40 尺，上海港外</td>
+        <td>2025 年 8 月，市场从大约 200 元调到大约 500 元。2026 年 8 月，外高桥附近一家堆场平时大柜大约 600 元；当天场满报到 700 元，8 月 12 日有货代报 900 元。堆场负责人说，旺季高位成交大约 800 元，挂到 1200 元是特殊收费。上千的报价多半是不想再收箱，不一定按这个数成交</td>
+        <td>恩尔仓储 2025-08-06 调价通知；每日经济新闻 2026-08-15 外高桥实探。台风前传过 6000 元，不当成市价</td>
+      </tr>
+      <tr>
+        <td>落箱，宁波</td>
+        <td>平时没有统一挂牌。2025 年 1 月 19 日 18 点起，舟信堆场把「暂放箱 + 进港」调到 1500 元/箱，同期个别堆场接近 2000 元</td>
+        <td>春节前爆场。当时北一集司、梅山堆存大约 95%，预进绿色通道暂停。这是那几天的价</td>
+      </tr>
+      <tr>
+        <td>拖车，宁波门点到港，40 尺</td>
+        <td>一份公开价表：北仑、小港大约 600 元，鄞州大约 800 元，海曙大约 1100–1200 元。远门点按里程另计。价表页面没有写年份</td>
+        <td>车少时在门点价上加。2025 年 1 月盐田有拖车报到 5500 元/柜、大约是平时的 3 倍，高价也不一定有车。2026 年春节前，上海有拖车费上涨约八成的报道</td>
+      </tr>
+      <tr>
+        <td>压夜</td>
+        <td>12.5 米到 17.5 米货车，压一夜常见 1000–1500 元。40 尺到厂免费装柜常见 3 小时，超时另收待时。小时单价各车队不同</td>
+        <td>国内货车压夜的常见口径。东方海外内陆条款写明超时和通宵另计，不报统一金额</td>
+      </tr>
+      <tr>
+        <td>超期用箱</td>
+        <td>市场不另挂一套价，按上一表的船公司价目。约价客户的免费期可以更长</td>
+        <td>马士基华东、民生出口的公布档</td>
+      </tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h3>旺季插队要多少钱</h3>
+  <div class="panel">
+    <p>旺季要插队，是舱位、空箱、车三处都在排队。多付的钱分三笔，合不进一个确保交付的总价。加价买到的是优先排队；装不装得上这一水，看配载和有没有书面不甩条款。</p>
+  </div>
+  <div class="wrap">
+  <table class="mx">
+    <thead>
+      <tr><th>插的是什么</th><th>市场看到的加价</th><th>加上之后</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>舱位</td>
+        <td>2026 年 6 月 19 日，浙江在线引述嘉兴一家代订舱平台：少数船公司在美线、欧线推「钻石舱」，起步加价 1000 美元/大柜以上。2026 年 8 月 5 日工商时报当周货代参考：美西现货表价 6500–7200 美元/40 尺，合约配舱大约 5600–6200 美元，现货比合约大约贵 900–1000 美元</td>
+        <td>同一篇浙江在线写明，加了价，大部分美线舱位仍然订不到，船期往往再顺延一周，码头堆存另计。这 1000 美元是优先报价</td>
+      </tr>
+      <tr>
+        <td>空箱和进港</td>
+        <td>上海大柜落箱从平时大约 600 元抬到当场 700–900 元。宁波节前「暂放 + 进港」到 1500 元，个别接近 2000 元，同时预进通道会停</td>
+        <td>买到的是当天有地方落、开港后进得去。船公司超售之后仍可能甩柜</td>
+      </tr>
+      <tr>
+        <td>车</td>
+        <td>在门点价上加一截。极端拥堵时，有港口的拖车涨到大约 3 倍仍约不到车。车在工厂过夜，再加 1000–1500 元</td>
+        <td>买到的是这天有车来。车来了，船满了还是上不去</td>
+      </tr>
+    </tbody>
+  </table>
+  </div>
+  <div class="panel">
+    <p>一只 40HQ，旺季既要插上一水，又要提前 2–3 天做箱：舱位按 2026 年 6 月钻石舱口径，至少多 1000 美元；上海落箱按当时满场大约 700–900 元；车若过夜，再加 1000–1500 元。用箱如果在提空后 7 个日历天内装上船，马士基华东的超期用箱仍是 0。三笔记三笔。</p>
+    <p>舱位已经书面确认、截港前 1–2 天也能装完进港的，不必为插队加价。</p>
+  </div>
+
+  <h3>旺季为什么难做</h3>
+  <div class="wrap">
+  <table class="mx">
+    <thead>
+      <tr><th>卡在哪</th><th>原因</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>提不到空箱</td>
+        <td>船公司控箱，堆场没有合适的空箱。放箱单有了，也可能排到后面，或者提出来是坏箱。旺季当天换箱经常排不上</td>
+      </tr>
+      <tr>
+        <td>约不到车</td>
+        <td>车少。车队先接运价高、距离近的柜子。远工厂和临时加柜容易约不到，约了也可能取消</td>
+      </tr>
+      <tr>
+        <td>窗口太窄</td>
+        <td>重箱只能在开港和截港之间进场，常常只有几天。大家都挤在截港前 1–2 天，堆场、闸口、码头一起排队</td>
+      </tr>
+      <tr>
+        <td>做完仍可能甩</td>
+        <td>超售在配载时才见分晓。旺季被甩的多，车费和装柜费退不回来</td>
+      </tr>
+    </tbody>
+  </table>
+  </div>
+  <p class="cap">码头不是凭一句「24 小时开放」就能提箱。堆场上班时间、放箱额度、车和箱况，才决定这一天做不做得成。</p>
+
+  <h3>验箱</h3>
+  <div class="panel">
+    <p>箱型、内寸、载重和码头要求见「箱型」sheet。提空时量内高、看破损潮湿，拍照。装不下就在堆场换，不要拉到工厂才发现。旺季换箱要留出同一天提第二只的时间。</p>
+    <p>车上有 GPS 可以看空箱到哪了。表里的浙B5E852 是当时的一个车号，不是固定车队。</p>
+  </div>
+
+  <h3 class="hho">HHO 视角</h3>
+  <p class="hho-note">关注点：这一环出问题能不能当天感知；会不会把「柜延误」说成「已经断货」；ETA / 预约 / 可售有没有拆开。知识库：履约看板异常闭环、FBA 预约与库存风险、头程提前感知。</p>
+  <div class="wrap">
+  <table class="mx">
+    <thead>
+      <tr><th>潜在风险</th><th>应该怎么应对</th><th>目前怎么应对</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>截港前重箱进不了场，这一水没了；预提花了钱仍可能甩</td><td>开港后截港前进港；截港当天未进港当天改下一水；预提只买进场不买交付</td><td>长荣/中远/东方海外/森罗可查进港；查不到的看互邦、长河有没有写进港</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+</section>
+
+<section class="sheet" id="sheet-box" data-sheet="box">
+  <h2 id="box">箱型</h2>
+  <p class="co-lead">代码、口语、内寸、载重对着看。群里说「高柜」「小柜」时，订舱单上仍要写成 40HQ、20GP。载重以箱门 CSC 铭牌和船公司放箱为准。</p>
+
+  <h3>常见箱型</h3>
+  <div class="wrap">
+  <table class="mx">
+    <thead>
+      <tr><th>箱型代码</th><th>行业口语</th><th>内部尺寸（约）</th><th>载重（约）</th><th>适用货物</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>20GP / 20DV</td>
+        <td>小柜、20 尺、20 普柜</td>
+        <td>5.9×2.35×2.39m</td>
+        <td>21.8 吨</td>
+        <td>普通干货、重货。体积小、单票重的优先</td>
+      </tr>
+      <tr>
+        <td>40GP / 40DV</td>
+        <td>中柜、平柜、40 普柜、大柜（有人笼统把 40 尺都叫大柜）</td>
+        <td>12.03×2.35×2.39m</td>
+        <td>26–28 吨</td>
+        <td>普通干货。内高不够时改订高柜。口语「大柜」含糊时，要问清是普柜还是高柜</td>
+      </tr>
+      <tr>
+        <td>40HQ / 40HC</td>
+        <td>高柜、40 高柜、大高柜</td>
+        <td>12.03×2.35×2.69m</td>
+        <td>26.5 吨</td>
+        <td>轻抛货、家电。美线最常用。旧箱内高会矮一截，提空时量一下</td>
+      </tr>
+      <tr>
+        <td>45HC / 45HQ</td>
+        <td>45 尺、45 高柜、超长柜</td>
+        <td>13.56×2.35×2.69m</td>
+        <td>27.7 吨</td>
+        <td>家具、纺织品。美国部分码头还空对 45 尺另有规则</td>
+      </tr>
+      <tr>
+        <td>20RF</td>
+        <td>20 冻柜、小冻柜、20 冷柜</td>
+        <td>约 5.4×2.29×2.27m</td>
+        <td>约 21–27 吨</td>
+        <td>短柜冷链。要插电、设温度</td>
+      </tr>
+      <tr>
+        <td>40RH / 40RF</td>
+        <td>冻柜、冷柜、40 冻柜（有人口语也叫冰柜）</td>
+        <td>11.5×2.28×2.54m</td>
+        <td>30.4 吨</td>
+        <td>冷链。全程要有电。温度写进 S/O。说「冻柜」默认多指 40 尺，订舱仍要写清 20 还是 40</td>
+      </tr>
+      <tr>
+        <td>20OT / 40OT</td>
+        <td>开顶、开顶柜、OT</td>
+        <td>20 尺约 5.89×2.35×2.34m；40 尺更长</td>
+        <td>20 尺约 21.6 吨</td>
+        <td>超高机械、吊装货。超高部分算 OOG</td>
+      </tr>
+      <tr>
+        <td>20FR / 40FR</td>
+        <td>框架、框架柜、FR</td>
+        <td>无箱壁，底板和端架</td>
+        <td>按铭牌</td>
+        <td>超宽、超长、重件。订舱报长宽高和重心</td>
+      </tr>
+      <tr>
+        <td>平板 / Platform</td>
+        <td>平板、平台柜</td>
+        <td>无端墙或端墙放倒</td>
+        <td>按铭牌</td>
+        <td>超长件。常按特种箱管</td>
+      </tr>
+      <tr>
+        <td>罐箱 / Tank</td>
+        <td>罐柜、tank 柜</td>
+        <td>罐体在框架内</td>
+        <td>按罐体额定</td>
+        <td>液体、化工。危品另走</td>
+      </tr>
+      <tr>
+        <td>双开门 / 侧开门</td>
+        <td>双开门、侧开门、开门柜</td>
+        <td>接近同尺干箱</td>
+        <td>接近同尺干箱</td>
+        <td>舱位少，订舱写清代码，不要只说「特殊柜」</td>
+      </tr>
+    </tbody>
+  </table>
+  </div>
+  <p class="cap">口语对照：小柜＝20 尺；中柜／平柜＝40 普柜（40GP）；高柜＝40HQ；45 尺要单说。有人把所有 40 尺都叫「大柜」，群里确认时要落到代码。GP=普柜，HQ/HC=高柜，RF/RH=冻柜，OT=开顶，FR=框架。VGM 是整箱毛重，不能超过铭牌最大总重。</p>
+
+  <h3>各码头对这类柜子的要求</h3>
+  <p class="co-lead">干箱走普通闸口和预约。冷柜、开顶、框架、超限（OOG）在免费期、预约、吊机上另有规则。下表是页面里已经核对过的码头口径，某一水以该码头当天系统为准。</p>
+  <div class="wrap">
+  <table class="mx">
+    <thead>
+      <tr><th>箱型类别</th><th>起运港（上海 / 宁波）</th><th>美西码头</th><th>美东码头</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>干箱<br>小柜 / 中柜 / 高柜</td>
+        <td>开港后、截港前进闸。闸口对柜号、封号、订舱号、箱型。VGM、截单按 S/O。落箱按尺码计次</td>
+        <td>多数洛杉矶、长滩要预约才能提。还空看当天按船公司+箱型公布的还空表。TraPac 一例：同一班里 20/40 和 45 的收法可以不同</td>
+        <td>PNCT 普通进出多不预约。APM Elizabeth 要 TERMPoint 预约。Maher 普通拖车不预约。干箱免费常见 4 天（工作日或开门日，看码头）</td>
+      </tr>
+      <tr>
+        <td>45HC</td>
+        <td>放箱、落箱、车型都按 45 尺。不是所有堆场、车队都常备</td>
+        <td>还空更紧。TraPac 洛杉矶曾出现：45 尺只收「提重同时还空」，单独还空不收。提之前先看当天 empty board</td>
+        <td>按该码头是否收 45 尺、是否要预约。不要用 40 尺的还空习惯套 45</td>
+      </tr>
+      <tr>
+        <td>冷冻柜</td>
+        <td>订舱写温度。提空查机组，装货后插电或发电机。进港后码头要有插头位。冷柜预提、用箱时钟按船公司冷柜价目</td>
+        <td>TraPac：进口冷柜免费 2 天（干箱 4 天）。自动化日开闸时，冷柜仍要预约。卸下后要插电，缺插头会拖可提时间</td>
+        <td>PNCT、APM、Maher：冷柜免费常见 2 天，短于干箱。周末闸口不开的日子通常不计免费期。提柜要确认插头和预约窗口</td>
+      </tr>
+      <tr>
+        <td>开顶 / 框架 / 平板<br>（含 OOG）</td>
+        <td>订舱报外尺寸和超限部位。可能要特殊放箱、绑扎照片、超限附加费。截港和配载更严，容易被留到下一水</td>
+        <td>按超限货管。闸口、吊具、堆位与干箱不同。提柜常要特种预约或白天班。不要按普通干箱的预约名额去赌</td>
+        <td>APM Elizabeth：超限货和框架捆可以不走普通 TERMPoint，但要按码头特种规则约。Maher：普通拖车不约，超限货的吊机要预约。PNCT：框架、开顶免费常见 2 天</td>
+      </tr>
+      <tr>
+        <td>罐箱 / 危品</td>
+        <td>适装、危申、UN 编号与普货分开。堆场和船公司都可能拒收临近截港的危品柜</td>
+        <td>危品堆位、查验、提柜窗口单独管。费用和停留规则看船公司与码头危品条款，不套干箱 demurrage 口算</td>
+        <td>同上。纽约港查验点与干箱分流。Red Hook 等支线码头不是亚洲干线主卸点，罐箱/危品不要按那里排</td>
+      </tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h3>和免费期、还空的关系</h3>
+  <div class="wrap">
+  <table class="mx">
+    <thead>
+      <tr><th>看什么</th><th>干箱</th><th>冷柜 / 开顶 / 框架</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>码头堆存免费</td>
+        <td>TraPac 洛杉矶普柜 4 天；美东多家干箱常见 4 个工作日或开门日</td>
+        <td>同一家码头常常只有 2 天。LFD 以系统为准，不要用干箱的 4 天去加</td>
+      </tr>
+      <tr>
+        <td>预约</td>
+        <td>美西多数要约；美东看码头</td>
+        <td>冷柜、超限往往额外要约或只能走指定班次。约不到，干箱的「免费期内挪 LFD」规则（纽约 APM）不一定套给特种箱</td>
+      </tr>
+      <tr>
+        <td>还空</td>
+        <td>按船公司+尺码看当天表</td>
+        <td>冷柜要还到收机组的地点；开顶、框架可能指定堆场。表上不收这一型，per diem 和车架继续走</td>
+      </tr>
+      <tr>
+        <td>车架</td>
+        <td>美西南 DCLI 约 47.50 美元/日历天</td>
+        <td>特种箱可能要特种车架或超限拖车，车队另报，不套普通柜日租口算</td>
+      </tr>
+    </tbody>
+  </table>
+  </div>
+  <p class="cap">订舱时箱型写进 S/O。改箱型等于改放箱、改车、改码头预约和还空规则。美线家电、轻抛货默认先按 40HQ 想；超高、超宽在工厂量完再定开顶或框架，不要先订干箱再现场改。</p>
+
+  <h3 class="hho">HHO 视角</h3>
+  <p class="hho-note">关注点：这一环出问题能不能当天感知；会不会把「柜延误」说成「已经断货」；ETA / 预约 / 可售有没有拆开。知识库：履约看板异常闭环、FBA 预约与库存风险、头程提前感知。</p>
+  <div class="wrap">
+  <table class="mx">
+    <thead>
+      <tr><th>潜在风险</th><th>应该怎么应对</th><th>目前怎么应对</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>口语「高柜」和订舱箱型不一致，或冷柜/OOG 按干箱约闸口</td><td>订舱单写 40HQ/20GP 等代码；特种箱按码头特种规则约闸口和吊机</td><td>箱型 sheet 已对口语与代码；特种箱某一水仍认码头当天系统</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+</section>
+
+<section class="sheet" id="sheet-pack" data-sheet="pack">
+<h2 id="pack">装柜</h2>
+  <p class="co-lead">空箱到厂之后、封柜离厂之前，是装柜。做箱负责把合格空箱送到工厂；这一节负责货装进这只箱、数量和封号被确认、司机再走。</p>
+  <div class="panel">
+    <p>下面八步是原先定的供应商装柜要求，玉桃按这个梳理过。汇一、持创按同一套执行。每一步都要等 HHO 在群里书面回复。任何一步没有书面确认就往下做，后果和费用由工厂承担。</p>
+  </div>
+
+  <h3>风险点和关键点</h3>
+  <div class="wrap">
+  <table class="mx">
+    <thead>
+      <tr><th>风险</th><th>现在怎么克服</th><th>放过会怎样</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>标贴错</td>
+        <td>贴标前，产品标签、外箱箱唛、特殊标都要和实物同框。群里回复「标签 OK」才贴</td>
+        <td>标贴上去再发现错，外箱要撕、重印、重贴。北美仓和报关对的是标和箱唛</td>
+      </tr>
+      <tr>
+        <td>货不对</td>
+        <td>装箱前看整件颜色、适配器、说明书。回复「商品 OK」才装</td>
+        <td>这三样从外箱上看不出来。纸箱封上以后只能拆箱。适配器规格不对，到了目的国不能卖</td>
+      </tr>
+      <tr>
+        <td>箱和车对不上</td>
+        <td>司机姓名牌、车牌、柜号、铅封号同框。回复「车辆 OK」才继续</td>
+        <td>柜号和封号要写进舱单、提单。到的不是这一票 S/O 的箱子，进港会被拒</td>
+      </tr>
+      <tr>
+        <td>坏箱装了货</td>
+        <td>空柜内部全景和四角先拍。破损、变形、潮湿、异味当场说明。没有指令不准装</td>
+        <td>货损之后要分清是箱子原有问题还是装货以后造成的。装完才发现，货已经脏了</td>
+      </tr>
+      <tr>
+        <td>SKU 和数量错</td>
+        <td>开装前拍整体、标贴近拍、商品特写，并附 SKU 和数量。回复「清单 OK」才装货</td>
+        <td>混柜少一个 SKU，到港对不上入库。装到一半才发现，已经占用柜和车</td>
+      </tr>
+      <tr>
+        <td>装的过程说不清</td>
+        <td>1/4 柜、半柜、满柜三张，装的时候就发到群里</td>
+        <td>只留一张满柜照，看不出下面垫了什么、中途有没有换货。短装和货损对不上层</td>
+      </tr>
+      <tr>
+        <td>封早了</td>
+        <td>关门前满柜全景要看得见货，加上最终装柜清单。回复「数量无误」才封柜</td>
+        <td>封条一上再点数，就要剪封、换封，舱单上的封号跟着改。赶上截港时常常来不及</td>
+      </tr>
+      <tr>
+        <td>人走了封号没留下</td>
+        <td>封柜全景和铅封条扣紧特写，封条号要清晰。回复「封柜 OK」司机才离厂</td>
+        <td>铅封是离厂到目的港开箱前的锁。扣不紧，途中可以打开。司机走了，工厂就看不到这只箱</td>
+      </tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h3>装柜八步</h3>
+  <p class="cap">逐条执行。第 1、2、3、5、7、8 步要等群里这句书面回复：标签 OK、商品 OK、车辆 OK、清单 OK、数量无误、封柜 OK。第 4 步在 HHO 指令下来之前不准装。第 6 步是装货当时把 1/4 柜、半柜、满柜发到群里，封柜仍然等第 7 步的「数量无误」。</p>
+  <div class="wrap">
+  <table class="mx">
+    <colgroup>
+      <col style="width:12%"><col style="width:40%"><col style="width:48%">
+    </colgroup>
+    <thead>
+      <tr><th>步</th><th>做什么，停在哪</th><th>为什么这样要求</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>1 贴标前</td>
+        <td>先拍照：产品标签与实物同框，外箱箱唛与实物同框，所有特殊标贴。发到 HHO 群。收到「标签 OK」才可贴标</td>
+        <td>标和货必须是同一件，才能让后面的人核对。贴完再改，外箱和人工都已经发生。特殊标漏贴，到港会被扣或拒收</td>
+      </tr>
+      <tr>
+        <td>2 商品核验</td>
+        <td>装柜或散货装箱前拍照：整件商品颜色、适配器、说明书。收到「商品 OK」才允许装箱、装柜</td>
+        <td>颜色、适配器、说明书是最容易装错、外箱又看不出来的三项。这一步放在封纸箱之前，拆箱成本还没发生</td>
+      </tr>
+      <tr>
+        <td>3 车辆信息</td>
+        <td>空柜到场后拍照：司机姓名牌、车牌、柜号、铅封号同框。收到「车辆 OK」才进入下一步</td>
+        <td>四项在一张照片里，避免柜号、封号、车牌各拍各的、事后对不上。司机和车牌是这只箱离厂到进港的责任人</td>
+      </tr>
+      <tr>
+        <td>4 空柜检查</td>
+        <td>拍照：空柜内部全景，加四角特写。破损、变形、潮湿、异味立即拍照并说明。未获 HHO 指令前严禁装柜</td>
+        <td>堆场验过一次，到厂还要再验。路上可能换成另一只箱。装货前的照片，是这只箱在装货时完好的证据</td>
+      </tr>
+      <tr>
+        <td>5 装柜清单复核</td>
+        <td>开始装货前拍照：商品整体摆拍、标贴近拍、商品特写，并附 SKU 和数量清单。收到「清单 OK」后开始装货</td>
+        <td>这一票装哪些 SKU、各多少，用清单对即将进柜的实物。仓库自己的拣货单不能代替群里的确认</td>
+      </tr>
+      <tr>
+        <td>6 装货过程</td>
+        <td>装货中分阶段拍照：1/4 柜、半柜、满柜（关门前全景）。实时发到 HHO 群</td>
+        <td>三张按时间留下装载顺序。短装、混装、中途换货，能对上是在哪一层发生的</td>
+      </tr>
+      <tr>
+        <td>7 满柜，封柜前</td>
+        <td>装货完毕、关门前拍照：满柜全景，要看得见全部货物，加最终装柜清单。收到「数量无误」才可封柜</td>
+        <td>这是点数的最后一次。门关上再改数量，铅封和舱单一起改，截港窗口往往不够用</td>
+      </tr>
+      <tr>
+        <td>8 封柜后</td>
+        <td>拍照：封柜全景，铅封条扣紧特写，封条号清晰。收到「封柜 OK」后司机方可离厂</td>
+        <td>封号要和后来的舱单一致，扣紧才不能在途中打开。离厂前把封号固定在照片里，司机再走</td>
+      </tr>
+    </tbody>
+  </table>
+  </div>
+  <div class="panel">
+    <p>拍照要求：原图、无美颜、带时间水印。原图和水印用来证明是装柜当时拍的，标、柜号、封号都看得清。</p>
+    <p>30 分钟内没有收到 HHO 回复，用电话或微信再提醒一次。车停在工厂，待时和截港都在走；提醒只为了尽快拿到书面回复。下一步仍然等群里那一句 OK。</p>
+  </div>
+
+  <h3 class="hho">HHO 视角</h3>
+  <p class="hho-note">关注点：这一环出问题能不能当天感知；会不会把「柜延误」说成「已经断货」；ETA / 预约 / 可售有没有拆开。知识库：履约看板异常闭环、FBA 预约与库存风险、头程提前感知。</p>
+  <div class="wrap">
+  <table class="mx">
+    <thead>
+      <tr><th>潜在风险</th><th>应该怎么应对</th><th>目前怎么应对</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>错标错货错数封早了，到美查验/拒收才发现，缺货窗口已丢</td><td>汇一/持创八步书面确认；缺确认司机不走；封号照片离厂前留底</td><td>靠群确认；八个确认时间没有系统台账，靠有人盯</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+</section>
+<section class="sheet" id="sheet-load" data-sheet="load">
+<h2 id="load">放行装船</h2>
+  <p class="co-lead">重箱进的是这一水 S/O 上的码头闸口。进门之后先落在出口堆场，海关放行、比对通过，船靠泊叫到这只箱，才从堆场吊上船。左边是箱子怎么走，右边是同一时刻的单据、清关，或这一步走不通时去哪。</p>
+<svg class="chart" viewBox="0 0 560 1088" role="img" aria-label="装船业务流程图">
+  <defs>
+    <marker id="ldArr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 Z" fill="#8b97a6"/></marker>
+    <marker id="ldP" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 Z" fill="#9a3412"/></marker>
+    <marker id="ldD" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 Z" fill="#1e4d7b"/></marker>
+    <marker id="ldC" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 Z" fill="#1d6b4a"/></marker>
+    <marker id="ldR" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 Z" fill="#8d3b3b"/></marker>
+  </defs>
+  <rect width="560" height="1088" fill="#f7f9fb"/>
+
+  <circle cx="18" cy="22" r="5" fill="#9a3412"/><text x="28" y="26" class="cap">物动</text>
+  <circle cx="86" cy="22" r="5" fill="#1e4d7b"/><text x="96" y="26" class="cap">单据</text>
+  <circle cx="154" cy="22" r="5" fill="#1d6b4a"/><text x="164" y="26" class="cap">清关</text>
+  <circle cx="222" cy="22" r="5" fill="#8d3b3b"/><text x="232" y="26" class="cap">这一步走不通</text>
+  <text x="20" y="52" class="cap">时间从上往下。横箭头是同一时刻两边对上。</text>
+
+  <!-- row y=68 -->
+  <rect x="16" y="68" width="248" height="78" rx="8" fill="#fff" stroke="#dbe1e8"/>
+  <rect x="16" y="68" width="248" height="4" fill="#9a3412"/>
+  <text x="30" y="96" class="ttl">封柜离厂</text>
+  <text x="30" y="120" class="sub">司机拿到「封柜 OK」才走</text>
+
+  <line x1="292" y1="107" x2="264" y2="107" stroke="#1e4d7b" stroke-width="1.5" marker-end="url(#ldD)"/>
+  <rect x="292" y="68" width="252" height="78" rx="8" fill="#fff" stroke="#dbe1e8"/>
+  <rect x="292" y="68" width="252" height="4" fill="#1e4d7b"/>
+  <text x="306" y="96" class="ttl">柜号、封号已固定</text>
+  <text x="306" y="120" class="sub">装柜最后一步的同框照片</text>
+
+  <line x1="140" y1="146" x2="140" y2="176" stroke="#9a3412" stroke-width="1.5" marker-end="url(#ldP)"/>
+
+  <!-- y=176 开港 -->
+  <rect x="16" y="176" width="248" height="78" rx="8" fill="#fff" stroke="#dbe1e8"/>
+  <rect x="16" y="176" width="248" height="4" fill="#9a3412"/>
+  <text x="30" y="204" class="ttl">开港了吗</text>
+  <text x="30" y="228" class="sub">开了，才往下进闸口</text>
+
+  <line x1="264" y1="215" x2="292" y2="215" stroke="#8d3b3b" stroke-width="1.5" marker-end="url(#ldR)"/>
+  <rect x="292" y="176" width="252" height="78" rx="8" fill="#fff" stroke="#dbe1e8"/>
+  <rect x="292" y="176" width="252" height="4" fill="#8d3b3b"/>
+  <text x="306" y="204" class="ttl">没开港</text>
+  <text x="306" y="228" class="sub">港外落箱，等到开港再进</text>
+
+  <line x1="140" y1="254" x2="140" y2="284" stroke="#9a3412" stroke-width="1.5" marker-end="url(#ldP)"/>
+  <text x="148" y="274" class="tag" fill="#9a3412">开了</text>
+
+  <!-- y=284 进门 -->
+  <rect x="16" y="284" width="248" height="78" rx="8" fill="#fff" stroke="#dbe1e8"/>
+  <rect x="16" y="284" width="248" height="4" fill="#9a3412"/>
+  <text x="30" y="312" class="ttl">闸口进门</text>
+  <text x="30" y="336" class="sub">截港前。对柜号、封号、订舱号</text>
+
+  <line x1="292" y1="323" x2="264" y2="323" stroke="#1e4d7b" stroke-width="1.5" marker-end="url(#ldD)"/>
+  <rect x="292" y="284" width="252" height="78" rx="8" fill="#fff" stroke="#dbe1e8"/>
+  <rect x="292" y="284" width="252" height="4" fill="#1e4d7b"/>
+  <text x="306" y="312" class="ttl">预录入、截单、VGM</text>
+  <text x="306" y="336" class="sub">进门前可以交。各有自己的截点</text>
+
+  <line x1="140" y1="362" x2="140" y2="392" stroke="#9a3412" stroke-width="1.5" marker-end="url(#ldP)"/>
+
+  <!-- y=392 堆场 -->
+  <rect x="16" y="392" width="248" height="78" rx="8" fill="#fff" stroke="#dbe1e8"/>
+  <rect x="16" y="392" width="248" height="4" fill="#9a3412"/>
+  <text x="30" y="420" class="ttl">落出口堆场</text>
+  <text x="30" y="444" class="sub">这一票 24 日 17:55 进门后落场</text>
+
+  <line x1="292" y1="431" x2="264" y2="431" stroke="#1d6b4a" stroke-width="1.5" marker-end="url(#ldC)"/>
+  <rect x="292" y="392" width="252" height="78" rx="8" fill="#fff" stroke="#dbe1e8"/>
+  <rect x="292" y="392" width="252" height="4" fill="#1d6b4a"/>
+  <text x="306" y="420" class="ttl">运抵 → 放行 → 比对</text>
+  <text x="306" y="444" class="sub">这一票 18:23 到 18:34，箱还在场</text>
+
+  <line x1="140" y1="470" x2="140" y2="500" stroke="#9a3412" stroke-width="1.5" marker-end="url(#ldP)"/>
+
+  <!-- y=500 比对 -->
+  <rect x="16" y="500" width="248" height="78" rx="8" fill="#fff" stroke="#dbe1e8"/>
+  <rect x="16" y="500" width="248" height="4" fill="#1d6b4a"/>
+  <text x="30" y="528" class="ttl">比对通过了吗</text>
+  <text x="30" y="552" class="sub">通过，才允许配进这一水</text>
+
+  <line x1="264" y1="539" x2="292" y2="539" stroke="#8d3b3b" stroke-width="1.5" marker-end="url(#ldR)"/>
+  <rect x="292" y="500" width="252" height="78" rx="8" fill="#fff" stroke="#dbe1e8"/>
+  <rect x="292" y="500" width="252" height="4" fill="#8d3b3b"/>
+  <text x="306" y="528" class="ttl">没通过</text>
+  <text x="306" y="552" class="sub">不能配船。查验会拖 1–2 天</text>
+
+  <line x1="140" y1="578" x2="140" y2="608" stroke="#1d6b4a" stroke-width="1.5" marker-end="url(#ldC)"/>
+  <text x="148" y="598" class="tag" fill="#1d6b4a">通过</text>
+
+  <!-- y=608 配载 -->
+  <rect x="16" y="608" width="248" height="78" rx="8" fill="#fff" stroke="#dbe1e8"/>
+  <rect x="16" y="608" width="248" height="4" fill="#9a3412"/>
+  <text x="30" y="636" class="ttl">配载叫到这只箱吗</text>
+  <text x="30" y="660" class="sub">叫到，才从堆场送去岸边</text>
+
+  <line x1="264" y1="647" x2="292" y2="647" stroke="#8d3b3b" stroke-width="1.5" marker-end="url(#ldR)"/>
+  <rect x="292" y="608" width="252" height="78" rx="8" fill="#fff" stroke="#dbe1e8"/>
+  <rect x="292" y="608" width="252" height="4" fill="#8d3b3b"/>
+  <text x="306" y="636" class="ttl">没叫到</text>
+  <text x="306" y="660" class="sub">箱子留在堆场，改下一水</text>
+
+  <line x1="140" y1="686" x2="140" y2="716" stroke="#9a3412" stroke-width="1.5" marker-end="url(#ldP)"/>
+  <text x="148" y="706" class="tag" fill="#9a3412">叫到</text>
+
+  <!-- y=716 吊上 -->
+  <rect x="16" y="716" width="248" height="78" rx="8" fill="#fff" stroke="#dbe1e8"/>
+  <rect x="16" y="716" width="248" height="4" fill="#9a3412"/>
+  <text x="30" y="744" class="ttl">岸桥吊上船</text>
+  <text x="30" y="768" class="sub">这一票 25 日 22:55 有装船</text>
+
+  <line x1="264" y1="755" x2="292" y2="755" stroke="#8b97a6" stroke-width="1.5" marker-end="url(#ldArr)"/>
+  <rect x="292" y="716" width="252" height="78" rx="8" fill="#fff" stroke="#dbe1e8"/>
+  <rect x="292" y="716" width="252" height="4" fill="#1e4d7b"/>
+  <text x="306" y="744" class="ttl">写下装船时刻</text>
+  <text x="306" y="768" class="sub">只说明这只箱子上了船</text>
+
+  <line x1="140" y1="794" x2="140" y2="824" stroke="#9a3412" stroke-width="1.5" marker-end="url(#ldP)"/>
+
+  <!-- y=824 船走了吗 -->
+  <rect x="16" y="824" width="248" height="78" rx="8" fill="#fff" stroke="#dbe1e8"/>
+  <rect x="16" y="824" width="248" height="4" fill="#9a3412"/>
+  <text x="30" y="852" class="ttl">船走了吗</text>
+  <text x="30" y="876" class="sub">装完还可以继续靠着装别的柜</text>
+
+  <line x1="264" y1="863" x2="292" y2="863" stroke="#8d3b3b" stroke-width="1.5" marker-end="url(#ldR)"/>
+  <rect x="292" y="824" width="252" height="78" rx="8" fill="#fff" stroke="#dbe1e8"/>
+  <rect x="292" y="824" width="252" height="4" fill="#8d3b3b"/>
+  <text x="306" y="852" class="ttl">只有装船，或离港时间未到</text>
+  <text x="306" y="876" class="sub">第一张图里离港时间还是空的</text>
+
+  <line x1="140" y1="902" x2="140" y2="932" stroke="#1d6b4a" stroke-width="1.5" marker-end="url(#ldC)"/>
+  <text x="148" y="922" class="tag" fill="#1d6b4a">已过</text>
+
+  <!-- y=932 离港 -->
+  <rect x="16" y="932" width="248" height="78" rx="8" fill="#eef6f1" stroke="#1d6b4a"/>
+  <rect x="16" y="932" width="248" height="4" fill="#1d6b4a"/>
+  <text x="30" y="960" class="ttl">这一水已离港</text>
+  <text x="30" y="984" class="sub">这一票写成 26 日 01:00</text>
+
+  <line x1="292" y1="971" x2="264" y2="971" stroke="#1d6b4a" stroke-width="1.5" marker-end="url(#ldC)"/>
+  <rect x="292" y="932" width="252" height="78" rx="8" fill="#eef6f1" stroke="#1d6b4a"/>
+  <rect x="292" y="932" width="252" height="4" fill="#1d6b4a"/>
+  <text x="306" y="960" class="ttl">ATD 已过，或 AIS 在航</text>
+  <text x="306" y="984" class="sub">ETD 从订舱起就有，不能当开走</text>
+
+  <text x="16" y="1044" class="cap">开港到计划离港常见 5–7 天，那是收箱窗口，船当时多半还不在泊位。</text>
+  <text x="16" y="1066" class="cap">船靠上以后，装货集中在离港前一天到当天。直装要码头另准，美线常态是先落堆场。</text>
+</svg>
+
+  <h3>怎么入港</h3>
+  <div class="wrap">
+  <table class="mx">
+    <thead>
+      <tr><th>步</th><th>发生什么</th><th>这一票的时刻</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>1 预录入</td>
+        <td>报关资料先交给海关。这一步可以在进门前做，放行要等运抵</td>
+        <td>2 月 24 日 14:38</td>
+      </tr>
+      <tr>
+        <td>2 进门</td>
+        <td>开港之后、截港之前，拖车到闸口。闸口对柜号、铅封、订舱号、箱型。过了才算进港</td>
+        <td>2 月 24 日 17:55</td>
+      </tr>
+      <tr>
+        <td>3 运抵</td>
+        <td>码头确认箱子已经在场，向海关发运抵。没有运抵，海关不放行</td>
+        <td>2 月 24 日 18:23，进门后约半小时</td>
+      </tr>
+      <tr>
+        <td>4 海关放行</td>
+        <td>海关对上运抵和预录入。查验会把这里拉长 1–2 天</td>
+        <td>2 月 24 日 18:24</td>
+      </tr>
+      <tr>
+        <td>5 无纸化比对</td>
+        <td>码头用海关放行信息比对。比对通过，这只箱子才允许配进装船。备注「该船已过截关期」是赶上了这一水的截关</td>
+        <td>2 月 24 日 18:34</td>
+      </tr>
+      <tr>
+        <td>6 装船</td>
+        <td>船靠泊、配载叫到这只箱，堆场送到岸边，岸桥吊上船。截单和 VGM 也要在各自截点前交齐</td>
+        <td>2 月 25 日 22:55，进门后约 29 小时</td>
+      </tr>
+    </tbody>
+  </table>
+  </div>
+  <p class="cap">例子是表内原图：柜号 BSIU9359880，提单 COSU6410107440，船 CSCL YELLOW SEA 航次 062E，宁波梅山出口，卸货港 USLGB。上海、宁波顺序相同，小时以这一水 S/O 为准。开港前进不了闸口。过了截港，正常闸口不再收这一水；临时再开的口子见下面「加载」。</p>
+
+  <h3>进港后先落堆场</h3>
+  <div class="panel">
+    <p>闸口后面是出口堆场。集卡在闸口把箱子交给码头，箱子落在堆场的贝位里，等这艘船靠泊。船靠上、配载叫到箱号，堆场机械才把它送到岸桥，岸桥吊上船。</p>
+    <p>这一票从 24 日 17:55 进门，到 25 日 22:55 才有装船，中间在堆场停了大约一天。放行和比对都在进门后一小时内完成，完成的时候箱子还在堆场上。</p>
+    <p>船已经靠泊、码头单独允许时，才有从集卡直接交到岸桥的直装。美线的常态是先落堆场。比对通过也还不等于装上这一水，配载仍然可以甩到下一水。</p>
+  </div>
+
+
+  <h3>截港过了，黄牛加载是干什么</h3>
+  <div class="panel">
+    <p>加载又叫晚集港、加急进港。公布的截港一到，闸口按计划不再收这一水的重箱，好让码头配舱。船还没离泊时，船公司可以单独同意某几只晚到的箱子，通知闸口再开一小段时间，收完这几只再关上。黄牛卖的就是这扇临时闸口。</p>
+    <p>他能在截港之后继续卖、而且卖给不止一个货主，是因为这个口子当时还没数清。船公司订舱时就会超售，放出的舱位比船能装的多，用来对冲订了却没来的柜子。实际进港比超售数少，晚到的箱子还有位置可加；来得多，多出来的就被甩。黄牛在空位还没点清的时候，就把「我能让你进」卖出去。卖出的票数可以多于闸口真正肯收的箱数。后到的、船公司没点头的，车开到门口也进不去。</p>
+    <p>同意收的时候，闸口常常只为点名的那只箱子开很短一会儿，不是把截港改回到原来的钟点、所有晚到的车都能进。码头堆场满了，或者这一层舱已经装完、再加就要大翻倒，船公司也可以不收。内支线经常没有加载，放行晚了就改下一水。</p>
+  </div>
+  <div class="wrap">
+  <table class="mx">
+    <thead>
+      <tr><th>买到的是什么</th><th>还要另过的关</th><th>费用</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>截港之后，这一只箱子被闸口临时收下，落进堆场</td>
+        <td>进门之后仍要运抵、海关放行、比对、配载叫到。截关过了、海关不放行，箱子在场里也上不了船</td>
+        <td>晚集港另收加急费。晚到导致翻舱的，再加翻倒费。没有统一价目</td>
+      </tr>
+      <tr>
+        <td>有人把已经在场的箱子盯住，让配载不要拿掉。这叫盯箱，和截港后才进门不是同一笔</td>
+        <td>船公司书面保箱才算留位。口头说能上，配载仍可以甩</td>
+        <td>有操作记录写过：马士基保箱大约 600 元一只；黄牛盯箱大约 600–1000 元，越接近开船越贵。这是个别航次里出现过的数，不是价目表</td>
+      </tr>
+    </tbody>
+  </table>
+  </div>
+  <p class="cap">倒卖舱位发生在截港之前，卖的是订舱名额。加载发生在截港之后，卖的是还能不能进这扇闸口。两笔都可能超售：承诺在前，船上的位置在后。</p>
+
+  <h3 id="late">船公司为什么还开这个口子</h3>
+  <div class="panel">
+    <p>截港是为了冻结配载。码头要按卸货港、重量把箱子堆好，岸桥才按顺序吊。这个钟点早于最后一吊。船还靠着、舱盖还没盖死的时候，计划里的空位还在。</p>
+    <p>空位来自超售。订了舱却没来的柜子，截港之后才数得清。船反正要开，空着一个舱位，这一水的运费就没了。晚到的箱子若还能放进剩下的格子，船公司收得回这一票运费，再加一笔晚集港费。格子已经没了、再加就要把已装的一层翻出来，这个口子就关上。</p>
+  </div>
+
+  <h3>码头为什么接受</h3>
+  <div class="panel">
+    <p>闸口认的是船公司重新写进装船清单的柜号。船公司通知「这只可以收」，码头才把闸口为它再开一会儿。黄牛说了不算，清单上没有这个柜号，车就进不去。</p>
+    <p>收下之后的动作码头都收费：进闸、落堆场，插进已经堆好的列里还要翻倒。船还在靠、这一贝还能吊，多一只箱子就是多几次计费的动作。晚到的箱子会把整艘船拖过泊位窗口的，码头会回绝。泊位、引航和后面排队的船，比一只柜子的装卸费贵。</p>
+  </div>
+
+  <h3 id="typhoon">台风为什么会把后面整段打乱</h3>
+  <div class="panel">
+    <p>码头的计划是一条按小时排好的队：哪艘船几点引航进槽、靠哪个泊位、桥吊干几个班、下一艘什么时候顶上。台风一来，引航停、桥吊绑住、闸口和进港的路一起关。停掉的那几个小时从队列里空掉，后面已经在路上的船不会把窗口让出来重排。</p>
+    <p>风停只是桥吊可以再动。锚地里积着没靠上的船，加上准点赶到的下一水，抢的是同一段泊位。一天的桥吊班次装不完三天的船。船在泊位上多停一天，后面每一艘都顺延。上海晚两天，这艘船到宁波、再到美国的靠泊一起晚。赶不上下一个窗口的，会跳过这个港，箱子改走下一水或用支线转过去。</p>
+  </div>
+  <div class="wrap">
+  <table class="mx">
+    <thead>
+      <tr><th>风停之后还堵在哪</th><th>为什么恢复不了原计划</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>泊位</td>
+        <td>停航那几天的船还在锚地。泊位一天只能靠这么多艘，队列要好几天到几周才消化完</td>
+      </tr>
+      <tr>
+        <td>堆场</td>
+        <td>该装走的重箱没走，该提走的进口箱也提不走，场地先满。满了就既不好卸船，也不收新的出口箱</td>
+      </tr>
+      <tr>
+        <td>开港和截港</td>
+        <td>船期一改，S/O 上的开港、截港一起改，而且经常到当天下午才看得到晚上开不开。工厂已经做完的箱子只能落在港外</td>
+      </tr>
+      <tr>
+        <td>车和闸口</td>
+        <td>路一通，积了几天的集卡同一天涌向闸口。闸口、堆场、桥吊再按各自的班次一辆辆收</td>
+      </tr>
+    </tbody>
+  </table>
+  </div>
+  <p class="cap">2026 年 8 月台风「白海豚」过后，每日经济新闻记的是：两港停摆大约 70 小时，上海和宁波舟山大约 40 万标箱滞留，上海锚地一度约 200 艘，等泊从大约 12 天降到 7 天，预计 9 月底才消化完。东海大桥一通，当天约 3 万辆集卡涌向码头。这是这一次的数，每次台风的天数不同，队列叠在一起的方式一样。</p>
+
+  <h3>开港后几天离港</h3>
+  <div class="panel">
+    <p>美线没有统一的「开港后第几天必须走」。开港常见在计划离港 ETD 前 5–7 天，所以从开港到计划离港大约 5–7 天。这 5–7 天是码头收重箱的窗口，船大部分时间还不在泊位上。</p>
+    <p>截港常见在 ETD 前 1–3 天。箱子多在离港前 1–3 天进场，在堆场里等船。船靠上以后，装货集中在离港前一天到当天。这一票船舶信息写到港 2 月 25 日 05:30、离港 2 月 26 日 01:00，靠泊装货大约十几个小时。表上「至少离港前 2 天进场」过死，最晚时点是这一水的截港。</p>
+    <p>上面都是计划。风、泊位、前一艘船没走完，实际离港 ATD 会晚于 ETD。</p>
+  </div>
+
+  <h3>怎么确认真的离港了</h3>
+  <div class="wrap">
+  <table class="mx">
+    <thead>
+      <tr><th>看到什么</th><th>说明什么</th><th>这一票</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>装船节点有时刻</td>
+        <td>这只箱子已经吊上船。船还可以继续靠着装别的柜子</td>
+        <td>2 月 25 日 22:55 才出现。前一张图只有比对，没有装船</td>
+      </tr>
+      <tr>
+        <td>船舶信息里的到港、离港时间</td>
+        <td>这一格会先写计划。时刻还没到，不能当成已经发生</td>
+        <td>第一张图最新节点是 24 日 18:43，到港时间已经写成 25 日 05:30，离港时间还是空的。第二张图才写上离港 26 日 01:00</td>
+      </tr>
+      <tr>
+        <td>船公司或货代跟踪里的 ATD、Vessel Departed</td>
+        <td>船公司按实际离泊记下的开船。ETD 从订舱起就有，一直看着 ETD 不能证明船走了</td>
+        <td>以跟踪里的 ATD 对上面那个离港时刻。两个都过去了，才算这艘船离开梅山</td>
+      </tr>
+      <tr>
+        <td>AIS 船位</td>
+        <td>船离开泊位、状态在航。单证补录会晚几个小时，船位单独能看</td>
+        <td>用船名 CSCL YELLOW SEA 对航次 062E。还停在梅山，就是没走</td>
+      </tr>
+    </tbody>
+  </table>
+  </div>
+  <p class="cap">海关放行、比对通过都发生在装船前。这一票 18:34 已经比对通过，船次日夜间才装这只箱，离港时间写在又过了大约两小时之后。</p>
+  <figure>
+    <img src="北美海运_img/0_5_r120.png" alt="进门当晚比对通过，尚未装船">
+    <figcaption class="cap">2 月 24 日当晚：进门、运抵、放行、比对通过。装船还没有，离港时间是空的。</figcaption>
+  </figure>
+  <figure>
+    <img src="北美海运_img/0_3_r145.png" alt="次日装船，离港时间已填写">
+    <figcaption class="cap">2 月 25 日 22:55 装船。船舶信息的离港时间写成 2 月 26 日 01:00。</figcaption>
+  </figure>
+
+  <h3 class="hho">HHO 视角</h3>
+  <p class="hho-note">关注点：这一环出问题能不能当天感知；会不会把「柜延误」说成「已经断货」；ETA / 预约 / 可售有没有拆开。知识库：履约看板异常闭环、FBA 预约与库存风险、头程提前感知。</p>
+  <div class="wrap">
+  <table class="mx">
+    <thead>
+      <tr><th>潜在风险</th><th>应该怎么应对</th><th>目前怎么应对</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>进港放行了但没上这一水；交付日仍按计划开船</td><td>认 ATD；计划离港日还在堆场则这一水作废改下一水并问亏舱</td><td>船司追踪能分已进港/已装船的目前是长荣、中远/东方海外、森罗，且常晚 2 天才叫</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+</section>
+<section class="sheet" id="sheet-sea" data-sheet="sea">
+<h2 id="sea">海运在途</h2>
+  <p class="co-lead">在途从实际离港 ATD 之后开始，到目的港卸进堆场为止。船走了没有，在上一节用 ATD 和 AIS 确认。这一段盯的是船还在不在原计划上，以及到港时间有没有改。</p>
+  <div class="panel">
+    <p><strong>监控标准（HHO）</strong>：在途日报每个工作日早上跑；船位/换船/ETA 变更当天进日报——差 1 天也记。行业旧表常见「一周三次」，我们不退回那个节奏。<strong>延误标签</strong>：相对计划偏晚 ≥3 天打「延误」（脚本 GAP_DAYS=3）；与「差 1 天写进日报」是两件事，不要混成一个阈值。</p>
+  </div>
+  <div class="wrap">
+  <table class="mx">
+    <thead>
+      <tr><th>看什么</th><th>看哪里</th><th>改了要做什么</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>船位和航速</td>
+        <td>船公司或货代跟踪，对照 AIS。船名、航次要和提单一致</td>
+        <td>船停在锚地、折返、或几天几乎不动，先问货代是等泊、绕航还是机器故障</td>
+      </tr>
+      <tr>
+        <td>中转、换船、跳港</td>
+        <td>跟踪里的二程船名。直航中途改成中转，或中转港没装上二程，都算断了原计划</td>
+        <td>柜子还在中转港，ETA 按新船重算。通知计划改交付，不要沿用订舱时的到港日</td>
+      </tr>
+      <tr>
+        <td>ETA</td>
+        <td>船公司公布的预计到港。每次改动都记下来，对原来的到仓或入库窗口</td>
+        <td>晚一天就改后面的预约。等到靠港再改，仓库和 FBA 的窗口经常已经过了</td>
+      </tr>
+      <tr>
+        <td>ATA 和卸船</td>
+        <td>实际靠港，以及柜子从船上卸进堆场的节点</td>
+        <td>靠港不等于能提。卸进堆场、码头放行、预约提柜，是下一段的事</td>
+      </tr>
+    </tbody>
+  </table>
+  </div>
+  <h3>保险为什么要在开船前买</h3>
+  <div class="panel">
+    <p>表上写保费只要万分之三。这是普货一切险里常见的一档报价，每一票以保单为准，不是法定费率。买的时间在开船前。船已经出了事再投，这一票保不上。</p>
+    <p>海商法给船公司留了航行过失免责：船长、船员、引航员在驾驶或管理船舶上的过失造成的货损，承运人可以不赔。另外还有赔偿限额，按每件 666.67 特别提款权，或者按毛重每公斤 2 特别提款权，取高的。提单上申报了货值并载明的，按申报的值。货值要靠货物保险补回来。一切险通常不保延误本身造成的损失，船期晚了，保险不负责仓库那头的空窗。</p>
+  </div>
+
+  
+  <h3>美东专段：巴拿马运河（枯水与排队）</h3>
+  <p class="co-lead">美东航线多数经巴拿马。枯水会限吃水、减每日过闸槽位；没有订到过河预约的船，锚地等待会拉长。这是船司 ETA 背后的原因之一，不是纽约码头闸口问题。</p>
+
+  <h4>一般什么时候水少、等待大概怎样</h4>
+  <div class="wrap">
+  <table class="mx">
+    <thead>
+      <tr><th>时段</th><th>流域大致情况</th><th>对过河的影响</th><th>等待量级（历史/官方口径）</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>旱季（约 12 月–翌年 4/5 月）</td>
+        <td>巴拿马太平洋侧传统旱季，Gatun 湖补给弱。ACP 的 LoTSA 长期槽位也明确按旱季窗口设计，方便船司提前锁过河日</td>
+        <td>吃水上限、日过闸艘次更容易被下调。美东头程订舱要按「可能多等」做交付情景</td>
+        <td>有 Booking 预约：过河日相对确定。无预约：枯水年会明显拉长（见下行 2023 例）</td>
+      </tr>
+      <tr>
+        <td>雨季（约 5/6 月–11/12 月）</td>
+        <td>正常年份湖位应回升。BTS 写过：雨季末湖位常见约 88 英尺量级</td>
+        <td>槽位与吃水往往比旱季宽松，但仍以当期 Advisory 为准，不能默认「雨季一定畅通」</td>
+        <td>无极端气候时，无预约船等待通常短于严重枯水年；有预约仍最稳</td>
+      </tr>
+      <tr>
+        <td>异常年（如 2023–24 El Niño）</td>
+        <td>雨季降水仍偏少。BTS：2023 年 6–11 月 Gatun 湖位在约 80 英尺附近徘徊，明显低于常年；限制延续到翌年旱季评估</td>
+        <td>日过闸从常年约 30 多艘级一度压到约 22–24；Neopanamax 吃水从约 50 英尺级压到约 44 英尺级（当年限制口径）</td>
+        <td>路透引 ACP：2023-08 无预约船平均等待约南行 8.9 天 / 北行 9.4 天（7 月约 5.6 / 6.6 天）。枯水高峰期，官方口径曾写：无预约可能无限期延误，预约是保证过河日的唯一机制</td>
+      </tr>
+      <tr>
+        <td>2026 年近况（举例，会变）</td>
+        <td>雨季已到但降水仍可能低于预期。ACP 2026-08 曾因流域降水偏少下调日槽位，并推迟吃水放宽</td>
+        <td>槽位、吃水、拍卖规则随通告调整；改善后也可能再上调（如后续 Advisory 增加 Neopanamax 槽位）</td>
+        <td>仍强调：确认过河预约才保证日期；无预约等待可能因减槽而上升。以当期通告为准，不要背死某一个「平均几天」</td>
+      </tr>
+    </tbody>
+  </table>
+  </div>
+  <p class="cap">季节是气候规律，不是保证。盯美东在途时：旱季默认多留缓冲；雨季也要扫一眼 ACP 是否刚发减槽/限吃水通告。等待天数看「这一水有没有 booked transit」，不要用行业传闻代替。</p>
+
+  <h4>风险机制（官方）</h4>
+  <div class="wrap">
+  <table class="mx">
+    <thead>
+      <tr><th>风险</th><th>官方机制</th><th>对 HHO 的意思</th><th>来源</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>流域降水偏少（枯水）</td>
+        <td>ACP 可下调每日过闸槽位、调整最大允许吃水（draft），并可能推迟吃水放宽</td>
+        <td>美东柜航程情景要留缓冲；吃水紧时可能甩载、改船或航程拉长</td>
+        <td>ACP 新闻稿与 Advisory to Shipping</td>
+      </tr>
+      <tr>
+        <td>过运河排队 / 无预约</td>
+        <td>Transit Reservation（Booking）分时段放槽；确认预约才保证过河日。未订到预约的船到锚地等</td>
+        <td>盯船位时问货代：有没有 booked transit、预计过河日。ETA 改了当天改美东仓预约</td>
+        <td>ACP Notice N-07；Advisory（枯水年曾写无预约可能无限期延误）</td>
+      </tr>
+      <tr>
+        <td>长期槽位 LoTSA</td>
+        <td>船司/运河客户通过密封投标拿未来数月的过河槽位包（Fix/Flex 等），便于旱季排班</td>
+        <td>这是船公司与 ACP 之间的事，不是货主合同。见下一表</td>
+        <td>ACP LoTSA 2.0 / 2.5 通告</td>
+      </tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h4>海洋联盟（OA）船有没有和巴拿马「签合约优先」</h4>
+  <p class="co-lead">这里的 OA = 海洋联盟（中远、达飞、长荣、东方海外）。结论先说清楚：HHO 作为货主，不会直接和巴拿马运河签过河优先协议；选 OA 船也不等于这一柜自动有过河优先。</p>
+  <div class="wrap">
+  <table class="mx">
+    <thead>
+      <tr><th>问题</th><th>事实</th><th>对订舱/在途的用法</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>谁和 ACP 打交道？</td>
+        <td>过河预约、LoTSA、拍卖的客户是船公司/船舶代理（Canal customer），不是国内货主或货代抬头</td>
+        <td>不要在货代合同里找「巴拿马优先条款」当履约保证。问的是：这一水船司有没有 booked transit</td>
+      </tr>
+      <tr>
+        <td>OA 成员在不在运河客户排名里？</td>
+        <td>ACP 每月公布 Customer Ranking。2026-09 报告里可见：达飞约第 3、中远约第 5、长荣约第 13（权重越小通常越靠前）。排名用于部分订舱时段的分配与平局规则，不是「OA 联盟整体一张优先卡」</td>
+        <td>选中远/达飞/长荣，相对有机会进入常规 Booking / LoTSA 竞争，但仍是船司自己中不中标、这一航次订没订到槽</td>
+      </tr>
+      <tr>
+        <td>有没有「OA 与运河的独家优先合约」？</td>
+        <td>公开机制是：普通 Booking 时段 + 拍卖 + LoTSA 长期槽位包。没有对外公布「海洋联盟整体保过河」的合同。东方海外常与中远共舱/同集团运营，过河仍落在实际营运船司客户名下</td>
+        <td>订美东 OA 产品，只提高「船司有能力抢槽」的概率，不保证准班过河</td>
+      </tr>
+      <tr>
+        <td>HHO 现在怎么用？</td>
+        <td>美东常订海洋联盟或 Gemini 等公布产品；运河段风险要另盯</td>
+        <td>订舱后：要货代书面或系统备注「是否已订过河 / 预计过河日」。在途 ETA 一漂，当天改美东仓预约。旱季美东交付默认多留一周级缓冲，极端枯水年按船司通知再加</td>
+      </tr>
+    </tbody>
+  </table>
+  </div>
+  <p class="cap">官方：<a href="https://pancanal.com/en/maritime-services/advisory-to-shipping/">ACP Advisory to Shipping</a>；Notice N-07 订舱规则；LoTSA 通告；Customer Ranking 例 <a href="https://evtms-rpts.pancanal.com/maritime/VI5350RP.pdf">VI5350RP</a>（每月更新）。等待历史：Reuters 2023-09 引 ACP；湖位背景：<a href="https://www.bts.gov/data-spotlight/us-trade-and-impact-low-water-levels-gatun-lake-and-panama-canal">US BTS</a>。</p>
+
+  <h3 class="hho">HHO 视角</h3>
+  <p class="hho-note">关注点：这一环出问题能不能当天感知；会不会把「柜延误」说成「已经断货」；ETA / 预约 / 可售有没有拆开。知识库：履约看板异常闭环、FBA 预约与库存风险、头程提前感知。</p>
+  <div class="wrap">
+  <table class="mx">
+    <thead>
+      <tr><th>潜在风险</th><th>应该怎么应对</th><th>目前怎么应对</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>ETA 改一天，仓库/FBA 窗口还是旧的；美东还多运河枯水/排队</td><td>工作日盯船位与 ETA；改一天当天改约；旱季美东多留缓冲；问清这一水有无 booked transit（选 OA 不等于自动优先）</td><td>在途日报工作日早跑；差满 3 天标延误，差 1 天仍进当天日报；运河季节/等待/OA 与 LoTSA 见本页上方</td></tr>
+      <tr><td>开船后再买保险；延误本身不赔仓库空窗</td><td>开船前买货值险；延误靠改约和补货计划扛，不指望一切险赔空窗</td><td>流程要求开船前投保；是否每票核对保单，靠业务自查</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+</section>
+<section class="sheet" id="sheet-dest" data-sheet="dest">
+<h2 id="dest">清关、提货、配送</h2>
+  <p class="co-lead">美国的码头是码头公司在经营。洛杉矶港、长滩港把泊位租给 APM、LBCT、TraPac、Fenix、美森这些经营者，每家有自己的闸口、预约和收费表。船靠哪一家，订舱时已经定了。卸下来先落在这家码头自己的堆场，不是从船边直接交到客户的车上。</p>
+
+  <h3>卸船怎么安排</h3>
+  <div class="panel">
+    <p>船靠上这家公司的泊位之后，由这家码头的桥吊按配载顺序卸。美西装卸劳务是码头公司和码头工会的班次，港口管理局不亲自卸船。先卸哪一层，看船上的贝位和后面还要装的出口箱，不按哪票货更急。</p>
+    <p>箱子离开船，先上码头内部的拖车或自动导引车，送到堆场的一个贝位，系统里记成已卸。也有一部分上码头内的铁路，不经过客户的车。堆场给出位置、海关放行、船公司放货、没有查验扣留，状态才变成可提。已卸和可提是两步。</p>
+  </div>
+  <div class="wrap">
+  <table class="mx">
+    <thead>
+      <tr><th>步</th><th>谁做</th><th>提柜之前要齐</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>卸进堆场</td>
+        <td>码头公司的桥吊和堆场</td>
+        <td>已卸只说明箱子在这家码头的场里</td>
+      </tr>
+      <tr>
+        <td>海关放行</td>
+        <td>美国报关行向海关申报。表上写的到港前 3–5 天，是为了卸下来就能放行的作业习惯，不是法律规定必须提前几天</td>
+        <td>海关扣查、FDA 等其他部门扣留，场里的箱子也提不走</td>
+      </tr>
+      <tr>
+        <td>船公司放货</td>
+        <td>运费结清、电放或正本提单到位，船公司给码头放货指令</td>
+        <td>有船公司扣货，预约页面上看不到可提</td>
+      </tr>
+      <tr>
+        <td>可提</td>
+        <td>码头系统</td>
+        <td>上面三项齐了，车队才能约这一家码头的闸口</td>
+      </tr>
+    </tbody>
+  </table>
+  </div>
+  <p class="cap">下面这张是 LBCT 的柜货查询。只查得到靠 LBCT 的船。APM、TraPac、Fenix、美森各用各的网址。</p>
+  <figure>
+    <img src="北美海运_img/0_6_r183.png" alt="LBCT 柜货查询">
+    <figcaption class="cap">表内原图。查的是这一家码头的箱子在不在场、能不能提。</figcaption>
+  </figure>
+
+  <h3>车队怎么预约</h3>
+  <div class="panel">
+    <p>美西多数码头提重箱、还空箱、送出口重箱都要预约。APM 洛杉矶的 TERMPoint 写明：进口箱必须先卸下船才能约，窗口结束前 30 分钟内、还有名额就可以约。这家码头提车架、还车架目前不要预约。</p>
+    <p>预约约的是一个闸口时段。没约就开到门口，预约制的码头不收这辆车。约了没赶上，要重约，常常排到下一班。车队约的是码头，仓库和 FBA 还要另约收货窗口。两头的时间对上，车才不会在码头外或仓库外空等。</p>
+    <p>表上写美森长滩专用码头提柜不用预约，周末不作业。美森加班船若卸在公用码头，就按那家公用码头的预约来。同一家船公司，专用码头和公用码头不是同一套闸口。</p>
+  </div>
+
+  <h3>车架费怎么加收</h3>
+  <div class="panel">
+    <p>美国的车架大多不是船公司的。洛杉矶、长滩用的是 DCLI、TRAC、Flexi-Van 这些车架公司的池子。车架费和船公司的用箱费分开算。2026 年 7 月 1 日起，DCLI 在洛杉矶长滩按车架本身计费，不再跟着箱子算。</p>
+    <p>DCLI 公布的美西南日租，2026 年 7 月 1 日起是每天 45 美元，另加损坏豁免 2.50 美元，合计 47.50 美元。按日历天算，含周末。周一下午 3 点提出、周二上午 11 点还回，不满 24 小时，也算 2 天。闸口另收的费用照单转给用车的车队。还错地点会另加调运费。</p>
+    <p>箱子在一个码头、车架在另一个码头，要先把车架拖过去，这是一笔分车架费。码头不收还空的那几天，车架日租不停。DCLI 写明拥堵不免车架费，车队先付给车架公司，再向船公司或货主收回。货主账单上常见三行：拖车、车架日租、分车架。</p>
+  </div>
+
+  <h3>还空怎么计费</h3>
+  <div class="wrap">
+  <table class="mx">
+    <thead>
+      <tr><th>费用</th><th>从哪天起</th><th>到哪天停</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>码头堆存 demurrage</td>
+        <td>免费期过后，箱子还在码头里。TraPac 洛杉矶的价目：进口普柜免费 4 天，从卸船当时起算，最后免费日凌晨 2:59 截止；冷柜 2 天。超期向船公司收的码头价，40 尺前 4 天每天 77.02 美元，第 5 天起每天 154.03 美元。货主看到的往往是船公司自己的价目，可以更高</td>
+        <td>重箱提出闸口。奥克兰同一家 TraPac，免费期从卸船后凌晨 3 点起算，和洛杉矶不是同一钟点</td>
+      </tr>
+      <tr>
+        <td>出码头后的用箱 per diem</td>
+        <td>船公司给的免费用箱天数用完。箱子已经在车上或仓库</td>
+        <td>空箱还进船公司当天指定、并且收这一票箱型的地点。地点不收，时钟继续走</td>
+      </tr>
+      <tr>
+        <td>车架日租</td>
+        <td>车架提出的那个日历天。美西南 DCLI 公布价每天 47.50 美元</td>
+        <td>车架还回车架公司指定地点。还空地点关门，车架费照算</td>
+      </tr>
+    </tbody>
+  </table>
+  </div>
+  <p class="cap">还空地点由船公司按当天、按箱型公布，不一定还回提柜的那家码头。2026 年 10 月 25 日 TraPac 洛杉矶第一班：HMM 干箱大多不收，ONE 的 20 尺、40 尺收、45 尺只收「提重同时还空」，阳明大多不收，以星全不收。以当天该码头的还空表为准。提重和还空绑在一次进闸里，还空往往可以不再单独占一个预约；只还空、不提重，仍要预约，而且当天不收这个船公司就不能进。</p>
+
+  <h3 id="jam">拥堵了，费用从哪天算</h3>
+  <div class="panel">
+    <p>会堵。堵在三个地方：船在锚地等泊；卸进堆场了但约不到车、没有车架；空箱提出来了，指定的还空点不收。新闻说港口拥堵的那一天，不会自动新开一笔「拥堵日租」。高出来的是原来那三笔时钟停不下来，堆存进入高档。罢工和台风是同一类：桥吊或闸口停了，船和车挤在重新开门的那几天。免费期只跳过码头标成关门的日子。</p>
+    <p>船还在锚地，箱子没卸，码头堆存还没开始。锚地多等的天数不按天另收一笔码头费。船公司如果加收拥堵或旺季附加费，按它自己公告的进港日或装船日，一箱收一笔，不是锚地一天算一天。</p>
+  </div>
+  <div class="wrap">
+  <table class="mx">
+    <thead>
+      <tr><th>这笔钱</th><th>从什么时候开始</th><th>拥堵时怎么走</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>码头堆存</td>
+        <td>看系统里的最后免费日，不看新闻日期。TraPac 洛杉矶：卸船当时起算，普柜免费 4 天，冷柜 2 天，最后免费日凌晨 2:59 截止。之后先按低档，40 尺每天 77.02 美元，连续 4 个计费日；第 5 个计费日起 154.03 美元。码头标成关门的日子不计入免费天数</td>
+        <td>闸口开着但没有预约名额，这套价目不自动停。账单从最后免费日的下一刻起算。箱子当天不可提，可以按这个理由去争议，争议之前账单已经开了。纽约 APM 有一条不一样：免费期内约不到，他们把最后免费日挪到下一个有名额的日子。洛杉矶 TraPac 不是这条</td>
+      </tr>
+      <tr>
+        <td>出码头后的用箱</td>
+        <td>重箱提出闸口之后，船公司给的免费天数用完的下一天</td>
+        <td>还空点不收这一票箱型，时钟继续，直到空箱进了一家当天收的地点</td>
+      </tr>
+      <tr>
+        <td>车架</td>
+        <td>车架提出的那个日历天。美西南 DCLI 公布价没有免费天，每天 47.50 美元，含周末</td>
+        <td>空箱压在车架上的每一天都算，包括还空点关门的日子。车架公司不免，车队先付再向船公司收回</td>
+      </tr>
+    </tbody>
+  </table>
+  </div>
+  <p class="cap">最后免费日以提柜那家码头系统里写的为准。关门日会把它往后推，自己用卸船日加 4 天会算早。上表 77.02 和 154.03 是 TraPac 2026 年 4 月 15 日价目里向船公司收的码头价。货主账单上的堆存按船公司价目，通常更高。洛杉矶、长滩另有一笔港口交通费，按 PierPass 当年价目，和堆存不是同一笔。纽约、新泽西没有这笔交通费。</p>
+
+  <h3 class="hho">HHO 视角</h3>
+  <p class="hho-note">关注点：这一环出问题能不能当天感知；会不会把「柜延误」说成「已经断货」；ETA / 预约 / 可售有没有拆开。知识库：履约看板异常闭环、FBA 预约与库存风险、头程提前感知。</p>
+  <div class="wrap">
+  <table class="mx">
+    <thead>
+      <tr><th>潜在风险</th><th>应该怎么应对</th><th>目前怎么应对</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>已卸不可提，免费期空转；自己用卸船日+4 算错最后免费日</td><td>认码头系统最后免费日；剩 2 天仍不可提或无预约当天报</td><td>日报已改：无真 LFD 时按免费 4 天代理，剩≤2 天（约到港≥2 天）未提 → P0；真 LFD/预约字段仍未接入</td></tr>
+      <tr><td>纽约约不到会挪免费日，洛杉矶 TraPac 不会</td><td>分码头规则；约不到当天升级，不假设免费日自动顺延</td><td>提货 sheet 已写差异；日报仍读不到码头「约不到」事件</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+</section>
+
+<section class="sheet" id="sheet-wh" data-sheet="wh">
+  <h2 id="wh">拖车与仓库</h2>
+  <p class="co-lead">清关提柜之后是送仓。亚马逊部分以官方承运人手册 / Partner Carrier 为准；无忧达部分以 HHO 合同报价单 + OpenAPI 实调字段为准。亚马逊不对外公布每个 FC 的「日吞吐件数」，下面用官方卸货窗口与约仓排队作代理指标。</p>
+
+  <h3>1、美国核心仓群（地理）</h3>
+  <p class="co-lead">先按港口腹地认「货落在哪一片」。第三方海外仓按合同仓码；亚马逊 FBA 仓码由系统分配。</p>
+  <div class="wrap">
+  <table class="mx">
+    <thead>
+      <tr><th>仓群（口语）</th><th>大致范围</th><th>对应头程港口</th><th>怎么用</th><th>依据</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>南加州 / LA</td>
+        <td>洛杉矶、长滩港周边，内陆帝国（Ontario 一带）</td>
+        <td>洛杉矶、长滩</td>
+        <td>美西海运到港后最短陆运。本公司补货里常归「美西」</td>
+        <td>地理腹地；本公司「美西」口径见补货计划（区分二级仓库）</td>
+      </tr>
+      <tr>
+        <td>北加州 / CA 北</td>
+        <td>湾区、萨克拉门托、Oakley / Hollister 一带</td>
+        <td>奥克兰等；也可经南加州转运</td>
+        <td>本公司观察仓 SCK8（Oakley）、HLI2（Hollister）在此片。订仓看目的仓，不要默认都卸长滩再送</td>
+        <td>地理；仓址来自公开 FC 地址对照 + 长河约仓表</td>
+      </tr>
+      <tr>
+        <td>西南 / AZ·TX</td>
+        <td>凤凰城、圣安东尼奥、达拉斯等</td>
+        <td>多经美西港转运，或美湾</td>
+        <td>GEU2（AZ）、SAT4（TX）与南加不是同一张约仓表</td>
+        <td>地理；长河约仓按仓码报</td>
+      </tr>
+      <tr>
+        <td>东北 / NJ·NY·PA</td>
+        <td>新泽西、纽约港周边；宾州 Imperial 等</td>
+        <td>纽约–新泽西</td>
+        <td>美东海运最短陆运。本公司补货常归「美东」。PIT2 在 PA。无忧达 NJJW* 是合同仓，不是亚马逊 FC</td>
+        <td>地理；本公司「美东」口径；无忧达仓码来自 OpenAPI / 入库字段</td>
+      </tr>
+      <tr>
+        <td>FBA（亚马逊）</td>
+        <td>全美多个 FC / IXD / 1DC，由建货件时分配</td>
+        <td>美西或美东港均可，再卡派</td>
+        <td>补货第三行「FBA」。目的仓以货件标签为准</td>
+        <td>Partner Carrier Guide；Send to Amazon</td>
+      </tr>
+    </tbody>
+  </table>
+  </div>
+  <p class="cap">补货粒度是统一 SKU × 美东 / 美西 / FBA。约卡车天数不要加进海运在途天数。详见本页「吞吐与排队」。</p>
+
+  <h3>2、亚马逊仓网布局（官方定义）</h3>
+  <p class="co-lead">履约要分清卸货点是哪种设施。定义来自 Amazon Prepaid / WePay 承运人手册与 Partner Carrier Guide，不是第三方科普。</p>
+  <div class="wrap">
+  <table class="mx">
+    <thead>
+      <tr><th>设施</th><th>官方定义</th><th>货怎么走</th><th>来源</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>FC（Fulfillment Center）</td>
+        <td>收货后把库存存放一段时间，再拣货打包发给买家的运营中心</td>
+        <td>标签上的 FC 码就是司机预约、卸货的点</td>
+        <td>US Prepaid Carrier Manual；Inbound NA WePay Carrier Manual</td>
+      </tr>
+      <tr>
+        <td>IXD（Inbound Cross Dock）</td>
+        <td>收货后做战略集拼，再发到最终 FC；IXD 本身不长期存库存</td>
+        <td>普通标准件常先到 IXD，再由亚马逊拆到多个 stow FC</td>
+        <td>同上；Partner Carrier Guide</td>
+      </tr>
+      <tr>
+        <td>1DC（One Distribution Center）</td>
+        <td>高流速新仓网节点：到仓时间窗口更严（±30 分钟），卸货更快</td>
+        <td>打托 LIVE 约 2 小时、地板约 4 小时内卸完；迟到会被盯得更紧</td>
+        <td>US Prepaid Carrier Manual「1DC Network」</td>
+      </tr>
+      <tr>
+        <td>AWD</td>
+        <td>Amazon Warehousing &amp; Distribution；与 AFN（FBA 履约网）货不能混在同一拖车</td>
+        <td>混装 AWD + AFN 到站可被拒收</td>
+        <td>Partner Carrier Guide</td>
+      </tr>
+      <tr>
+        <td>non-sortable / specialty 能收的 FC</td>
+        <td>不同 FC 收货/上架能力不同；服装、鞋、电视、危品、大件、超大件可能直分到能收的仓</td>
+        <td>拆仓是系统行为。没有公开的「仓码×品类」固定对照表</td>
+        <td>Partner Carrier Guide</td>
+      </tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h4>按产品类型怎么进网</h4>
+  <div class="wrap">
+  <table class="mx">
+    <thead>
+      <tr><th>产品 / 库存类型</th><th>官方怎么处理</th><th>对履约的意思</th><th>官方来源</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>普通标准件 / sortable（非特种）</td>
+        <td>常先到 IXD，再分到多个上架 FC</td>
+        <td>跟踪认货件 ID，不要只盯一个仓码</td>
+        <td>Partner Carrier Guide</td>
+      </tr>
+      <tr>
+        <td>特种 specialty</td>
+        <td>服装、鞋、电视、危品等，可能直分到能收的多个 FC</td>
+        <td>同类产品拆仓是系统行为</td>
+        <td>同上 PDF</td>
+      </tr>
+      <tr>
+        <td>大件 / heavy bulky、超大 / oversize、non-sort</td>
+        <td>分到能收这类货的 stow FC</td>
+        <td>大件不要按标准件「一个仓」约车</td>
+        <td>同上</td>
+      </tr>
+      <tr>
+        <td>危险品</td>
+        <td>须符合 FBA Dangerous Goods；多数爆炸品、易燃气/液等禁止。Capacity Manager 不含危品库容</td>
+        <td>未过审可能拒收或销毁（费用自负）</td>
+        <td>Dangerous goods identification guide；Seller Central</td>
+      </tr>
+    </tbody>
+  </table>
+  </div>
+  <p class="cap">PDF：<a href="https://m.media-amazon.com/images/G/01/inbound/Amazon_Inbound_Transportation/Partnered_Carrier_Guide.pdf">Partner Carrier Guide</a>；<a href="https://m.media-amazon.com/images/G/01/magicarp/common/US_Prepaid_Carrier_Manual.pdf">US Prepaid Carrier Manual</a>；<a href="https://m.media-amazon.com/images/G/01/magicarp/common/WePay_Ops_Manual_NAAmazon.pdf">WePay Ops Manual NA</a>。</p>
+
+  <h3>3、吞吐与排队（官方指标 + 约仓代理）</h3>
+  <p class="co-lead">亚马逊不公开发布「某 FC 每天能收多少托 / 多少件」。公开文件给的是卸货时长、准时窗口、预约与拒收规则。现场松紧用约卡车排队天数作代理（长河周报，不是亚马逊官方吞吐数字）。</p>
+  <div class="wrap">
+  <table class="mx">
+    <thead>
+      <tr><th>指标</th><th>官方要求</th><th>怎么用</th><th>来源</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>LIVE 卸货免费时间</td>
+        <td>标准 LIVE 预约：每约一次免费卸货时间 2 小时</td>
+        <td>超时会进滞车/争议。约仓按能在窗口内卸完准备</td>
+        <td>US Prepaid Carrier Manual</td>
+      </tr>
+      <tr>
+        <td>1DC 卸货节奏</td>
+        <td>打托约 2 小时、地板约 4 小时；到仓 ±30 分钟</td>
+        <td>1DC / 高流速仓比普通 FC 更不容迟到、更不容混装乱托</td>
+        <td>同上「1DC Network」</td>
+      </tr>
+      <tr>
+        <td>准时到仓 OTA</td>
+        <td>相对预约到仓时刻（SAT）：最早不超过提前 30 分钟，最晚不超过延后 30 分钟</td>
+        <td>车队按 ±30 分钟盯点；NCNS（约了不来）进承运人处罚体系</td>
+        <td>同上；WePay Manual</td>
+      </tr>
+      <tr>
+        <td>Delivery Window</td>
+        <td>2025-09 起：国内与国际货件均指定 7 天（周日–周六）送达窗口，预约必须落在窗口内</td>
+        <td>海运 ETA 一旦漂出窗口，要改约或改货件，不能假装「到了再约」</td>
+        <td>US Prepaid Carrier Manual</td>
+      </tr>
+      <tr>
+        <td>整车上限（TL）</td>
+        <td>单车最大约 40,000 lb、3,500 cu ft；可堆叠最多约 60 托 / 不可堆叠约 30 托；可地板装</td>
+        <td>超限要拆票或换模式</td>
+        <td>Prepaid / WePay Manual</td>
+      </tr>
+      <tr>
+        <td>LTL</td>
+        <td>通常 &lt;53′ 拖车一半货量；须打托；常经 cross-dock</td>
+        <td>与地板货不能混在同一拖车</td>
+        <td>同上</td>
+      </tr>
+      <tr>
+        <td>拒收</td>
+        <td>无法安全卸货或无法核验内容物时可拒收整车或部分；打托与地板不可混装；冷藏车瓦楞底板地板货拒收</td>
+        <td>装车前按一种装载方式做完</td>
+        <td>同上</td>
+      </tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h4>约仓排队（吞吐压力代理 · 长河 2026-10-13）</h4>
+  <p class="co-lead">「卡板/地板天数」= 约卡车还要等的天数，不含海运。爆仓仓越多、平均天数越高，说明该片区入库窗口越紧。</p>
+  <div class="wrap">
+  <table class="mx">
+    <thead>
+      <tr><th>片区</th><th>表内仓数</th><th>爆仓</th><th>爆仓趋势</th><th>正常</th><th>约仓天数均值（有数时）</th><th>本公司相关仓</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>加州</td><td>27</td><td>5</td><td>10</td><td>12</td><td>约 7.8 天</td><td>SCK8 爆仓 15/18；HLI2 正常 7/2</td></tr>
+      <tr><td>东北</td><td>25</td><td>5</td><td>7</td><td>13</td><td>约 7.8 天</td><td>PIT2 正常 5/3</td></tr>
+      <tr><td>东南</td><td>15</td><td>4</td><td>0</td><td>11</td><td>约 8.7 天</td><td>—</td></tr>
+      <tr><td>中西</td><td>7</td><td>3</td><td>0</td><td>4</td><td>约 11.9 天</td><td>—</td></tr>
+      <tr><td>西南（含 AZ/NV）</td><td>7</td><td>2</td><td>3</td><td>2</td><td>约 8.8 天</td><td>GEU2 正常 3/4</td></tr>
+      <tr><td>德州</td><td>6</td><td>2</td><td>2</td><td>2</td><td>约 13.2 天</td><td>SAT4 爆仓 21/20</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <p class="cap">逐仓明细见同目录 <a href="./亚马逊仓库拥堵.html">亚马逊仓库拥堵.html</a>。长河不是亚马逊官方吞吐公告；亚马逊侧只认 Carrier Central 预约结果与手册规则。</p>
+
+  <h3>4、卡车 / 拖车尺寸、托盘、送仓要求（官方）</h3>
+
+  <h4>联邦与常见车型尺寸</h4>
+  <div class="wrap">
+  <table class="mx">
+    <thead>
+      <tr><th>项目</th><th>官方规定</th><th>日常怎么用</th><th>来源</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>车辆宽度</td>
+        <td>国家公路网（National Network）上，各州对商用车宽度限制须为 102 英寸（约 2.6 m）；夏威夷例外可 108 英寸</td>
+        <td>干货车箱外侧宽度按 102″ 理解。超宽要许可</td>
+        <td>23 CFR §658.15；FHWA Commercial Vehicle Size and Weight</td>
+      </tr>
+      <tr>
+        <td>半挂长度</td>
+        <td>联邦不设大多数拖挂的总长上限；各州不得在国家公路网上把半挂长度限制设得低于 48 英尺（另有祖父条款更长）</td>
+        <td>州际干线常见 53 英尺厢式半挂。加州等对祖父长度另有表。约车写清 53′ 还是更短</td>
+        <td>23 CFR §658.13；FHWA Federal Size Regulations for CMVs</td>
+      </tr>
+      <tr>
+        <td>车辆高度</td>
+        <td>联邦不设统一高度；各州自定，常见约 13′6″–14′</td>
+        <td>过桥、进仓门前确认限高，不要按「全国统一高度」口算</td>
+        <td>FHWA 同上</td>
+      </tr>
+      <tr>
+        <td>亚马逊 LTL 装货场地</td>
+        <td>Partnered LTL 说明：要留出 53 英尺拖车空间，或申请厢式货车；&lt;12 托且 &lt;20,000 lb 可要求尾板</td>
+        <td>工厂/海外仓装车按能停 53′ 拖车准备，否则提前说 lift-gate / box truck</td>
+        <td>sell.amazon.com「Pay less to stock more with Amazon LTL carriers」</td>
+      </tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h4>亚马逊 FBA 托盘与打托（Seller requirements）</h4>
+  <div class="wrap">
+  <table class="mx">
+    <thead>
+      <tr><th>要求</th><th>内容</th><th>来源</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>托盘规格</td>
+        <td>40×48 英寸、四向进叉木质托盘。不要用塑料、纸板、刨花板托盘。单件过大无法落在 40×48 上且不外伸时，可用适合该件的托盘尺寸</td>
+        <td>Seller requirements for LTL, FTL, and FCL deliveries</td>
+      </tr>
+      <tr>
+        <td>托盘等级</td>
+        <td>GMA Standard B 级或以上。食品杂货仅 GMA 1A。健康个护与美妆仅 GMA 1A / 1B。破损托盘可拒收，费用卖方承担</td>
+        <td>同上</td>
+      </tr>
+      <tr>
+        <td>重量</td>
+        <td>单托总重不超过 1,500 lb（约 680 kg）</td>
+        <td>同上</td>
+      </tr>
+      <tr>
+        <td>高度</td>
+        <td>单托一般不超过 72 英寸（含托盘），除非单件本身更高。Partnered carrier：40×48 托盘上单托不超过 72 英寸。理想可堆叠高度约 50 英寸（箱约 45 + 托盘约 5）。符合 Floor Loading / clampable 时单托最高可至 98 英寸（仓端会拆成两托）</td>
+        <td>同上；Amazon 员工在 Seller Forums 引述帮助页</td>
+      </tr>
+      <tr>
+        <td>装载间隙</td>
+        <td>托盘总高须距车厢顶至少 6 英寸；托盘之间至少留约 3 英寸</td>
+        <td>同上</td>
+      </tr>
+      <tr>
+        <td>缠膜与标签</td>
+        <td>透明缠绕膜固定；膜外四面贴 FBA 托盘标签；箱唛朝外可扫。一托只属于一个 shipment ID</td>
+        <td>同上</td>
+      </tr>
+      <tr>
+        <td>箱数上限</td>
+        <td>单票 LTL 不超过 5,000 箱；超过须拆第二票。Partnered：&lt;12 托多为 LTL，&gt;12 为 FTL；每票最多一辆整车</td>
+        <td>Seller requirements；Partner Carrier Guide</td>
+      </tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h4>送亚马逊仓的预约与单据</h4>
+  <div class="wrap">
+  <table class="mx">
+    <thead>
+      <tr><th>要求</th><th>内容</th><th>来源</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>送货预约</td>
+        <td>自有承运人送 LTL/FTL：须在 Amazon Carrier Central 预约。无预约到仓可拒收。Partnered 承运人通常由亚马逊代约</td>
+        <td>Carrier Central Manual（US）；Send to Amazon Guide；sell.amazon.com LTL 说明</td>
+      </tr>
+      <tr>
+        <td>Carrier Central 准入</td>
+        <td>需有效 SCAC、与 FMCSA 一致的公司名、USDOT（Authorized，可运 General Freight）等</td>
+        <td>Carrier Central Manual USAmazon.pdf</td>
+      </tr>
+      <tr>
+        <td>提单 BOL</td>
+        <td>须含 Amazon reference ID、shipment ID、卖方信息、承运人 SCAC、件数（托/箱）、整车要拖车号与铅封等。不合规 BOL 可拒收</td>
+        <td>Seller Central「Basics of Bills of Lading」及 LTL/FTL 要求</td>
+      </tr>
+      <tr>
+        <td>目的仓</td>
+        <td>预约所选 FC 必须与箱唛 / 标签上的目的仓一致，选错会拒收</td>
+        <td>Seller Forums 官方回复（AWD/FC 预约）；Carrier Central 流程</td>
+      </tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h3>5、无忧达入库要求（合同报价 + OpenAPI）</h3>
+  <p class="co-lead">OpenAPI 能拉到入库单状态、目的仓码、预约时段、柜号等字段；<b>没有</b>「入库要求说明书」类接口。入库规则以无忧达美国海外仓 2026 VIP 报价（HHO【CN0304】，生效 2026-01-11—2026-12-31）为准——这是合同报价文件，不是 Seller Central。</p>
+
+  <h4>美国仓群与本公司有库存的仓码</h4>
+  <div class="wrap">
+  <table class="mx">
+    <thead>
+      <tr><th>报价仓群</th><th>对应仓码前缀（API）</th><th>怎么用</th><th>依据</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>CA 仓群（美西）</td><td>CAJW* / CAXX*</td><td>美西头程优先对这片。库存接口近期有货：CAJW05、CAJW06、CAJW02、CAJW04 等</td><td>报价「仓储服务」仓群列；warehouseInventory.query</td></tr>
+      <tr><td>NJ 仓群（美东北）</td><td>NJJW* / NJXX*</td><td>美东头程。库存接口近期量最大：NJJW03</td><td>同上</td></tr>
+      <tr><td>TX 仓群（美中南）</td><td>TXJW* / TXXX*</td><td>达拉斯 / 休斯顿合同仓</td><td>同上；仓库列表 API 缓存</td></tr>
+      <tr><td>GA 仓群（美东南）</td><td>GAJW*</td><td>亚特兰大片</td><td>同上</td></tr>
+      <tr><td>IL 仓群（美中北）</td><td>ILJW* / ILXX*</td><td>芝加哥片</td><td>同上</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <p class="cap">仓列表来自无忧达 OpenAPI 仓库清单缓存；是否「在用」以接口 isInUse / 实际下单目的仓为准，页面不猜关闭仓。</p>
+
+  <h4>常规入库场景（报价强制口径）</h4>
+  <div class="wrap">
+  <table class="mx">
+    <thead>
+      <tr><th>场景</th><th>要求 / 计费要点</th><th>对操作的意思</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>整柜入库</td><td>按柜型收卸货收货费（20GP / 40GP·HQ / 45HQ）；无忧达头程与自发头程价不同。默认 DROP 卸柜；若约 LIVE 且仓同意，自发头程加收 LIVE 卸货费</td><td>订舱选柜型前先对报价柜型行。想 LIVE 要先约通</td></tr>
+      <tr><td>打托入库</td><td>单托 1 个 SKU 与混托（SKU≥2）单价不同</td><td>能单 SKU 一托就不要混托</td></tr>
+      <tr><td>快递入库（非退货）</td><td>按大箱实重分档；一箱多件另收清点费</td><td>小包进仓走快递价，不是整柜价</td></tr>
+      <tr><td>未打托散货（地板卡派 / 海运拼箱）</td><td>按收货实重；无忧达头程海运拼箱免基础卸货费，转仓/移仓等不免</td><td>地板货与打托价完全两套</td></tr>
+      <tr><td>上架</td><td>常规入库上架费免费（清点后上架）</td><td>常规货清点完即上架，不另收上架</td></tr>
+      <tr><td>超 SKU / 超重 / 超件</td><td>单票 SKU&gt;10 阶梯加收；单箱&gt;45 kg 加收；整柜大箱&gt;1000 超出加收</td><td>一票少 SKU、单箱别超 45 kg、整柜控制箱数</td></tr>
+      <tr><td>一箱多件</td><td>须贴红色胶带；混 SKU 装箱要拆箱清点加收；单 SKU 默认不清点</td><td>一箱多件必须红胶带；严禁一箱混多 SKU</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h4>预约与异常（整柜）</h4>
+  <div class="wrap">
+  <table class="mx">
+    <thead>
+      <tr><th>规则</th><th>内容</th><th>来源</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>预约变更</td><td>预约确认后，预约时间前 24 小时内取消/改约：自发头程按柜收费（无忧达头程该项免费）</td><td>报价「入库异常费」</td></tr>
+      <tr><td>到仓窗口</td><td>须在预约确认时段 ±3 小时内到仓；未预约送仓可能拒收，异常费用自担</td><td>同上</td></tr>
+      <tr><td>DROP / LIVE</td><td>整柜默认 DROP；要求 LIVE 且预约同意则加收 LIVE 卸货费（自发）</td><td>同上</td></tr>
+      <tr><td>空柜堆存</td><td>系统发还空通知后 2 个工作日内未提空柜，按超过天数加收（自发）</td><td>同上</td></tr>
+      <tr><td>无预报 SKU</td><td>实收有、入库单无该 SKU → 按 SKU 加收处理费</td><td>同上</td></tr>
+      <tr><td>标签异常</td><td>贴标不规范/贴错/漏贴/扫不出 → 仓侧重贴，按张计费</td><td>同上</td></tr>
+      <tr><td>拒收权</td><td>未按无忧达入库要求或其他异常，仓库有权拒收；清点与测量以仓反馈为准，争议以二次复核为准</td><td>报价「常规入库」注</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h4>OpenAPI 实际能看到什么</h4>
+  <div class="wrap">
+  <table class="mx">
+    <thead>
+      <tr><th>接口</th><th>已验证字段 / 用途</th><th>看不到的</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><code>/oms/openapi/inbound/v1/inbound/queryPage</code></td>
+        <td>入库单号、状态（在途/收货/上架等）、目的仓 destWarehouse、柜号、ETD/ETA、提柜/卸柜/收货/上架时间、预约号与预约送仓时段、货物类型（整柜/拼箱/快递等）、运输方式、托数 trayNum、SKU 明细</td>
+        <td>托盘尺寸、门高、是否收 53′、品类禁运清单等「操作手册」条文（报价 PDF/Excel 才有）</td>
+      </tr>
+      <tr>
+        <td><code>/oms/openapi/stock/v1/warehouseInventory/query</code></td>
+        <td>按仓码的在库 / 在途 / 待上架等库存数量</td>
+        <td>仓内吞吐、预约拥堵天数</td>
+      </tr>
+    </tbody>
+  </table>
+  </div>
+  <p class="cap">本机已用 WYD_APP_ID 实调上述路径。Swagger 公开页 404；规则以桌面报价文件「无忧达美国海外仓2026vip报价-HHO【CN0304】.xlsx」入库服务 sheet 为准。</p>
+
+  <h3>来源清单</h3>
+  <div class="panel">
+    <p>1. FHWA：<a href="https://ops.fhwa.dot.gov/freight/sw/overview/index.htm">Commercial Vehicle Size and Weight</a>；eCFR <a href="https://www.ecfr.gov/current/title-23/chapter-I/subchapter-G/part-658">23 CFR Part 658</a></p>
+    <p>2. Amazon：<a href="https://m.media-amazon.com/images/G/01/inbound/Amazon_Inbound_Transportation/Partnered_Carrier_Guide.pdf">Partner Carrier Guide</a>；<a href="https://m.media-amazon.com/images/G/01/magicarp/common/US_Prepaid_Carrier_Manual.pdf">US Prepaid Carrier Manual</a>；<a href="https://m.media-amazon.com/images/G/01/magicarp/common/WePay_Ops_Manual_NAAmazon.pdf">WePay Ops Manual NA</a>；<a href="https://images-na.ssl-images-amazon.com/images/G/01/magicarp/common/Carrier_Central_Manual_USAmazon.pdf">Carrier Central Manual</a>；Seller requirements for LTL/FTL/FCL</p>
+    <p>3. 无忧达：美国海外仓 2026 VIP 报价 HHO【CN0304】（入库服务 / 仓储服务）；OpenAPI inbound.queryPage、warehouseInventory.query（本机凭据实调）</p>
+    <p>4. 约仓代理：长河周报截止 2026-10-13 → <a href="./亚马逊仓库拥堵.html">亚马逊仓库拥堵.html</a>；本公司补货美东/美西/FBA 口径</p>
+  </div>
+
+  <h3 class="hho">HHO 视角</h3>
+  <p class="hho-note">关注点：这一环出问题能不能当天感知；会不会把「柜延误」说成「已经断货」；ETA / 预约 / 可售有没有拆开。知识库：履约看板异常闭环、FBA 预约与库存风险、头程提前感知。</p>
+  <div class="wrap">
+  <table class="mx">
+    <thead>
+      <tr><th>潜在风险</th><th>应该怎么应对</th><th>目前怎么应对</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>海运 ETA 漂了，约仓还是订舱时窗口；爆仓仓硬送被拒或空等</td><td>ETA 改动当天看该仓最早可约日；约仓天数不与海运天数相加；预约三阶段分开看</td><td>无忧达 ETA 对货代；FBA 货件在日报；约仓按仓按周进周一日报</td></tr>
+      <tr><td>把约仓排队当成已上架可售</td><td>预约等待 / 到仓卸货 / 接收上架拆开；到仓≠可售</td><td>拥堵页有约仓天数；可售日仍靠 FBA/海外仓入库字段，空值不瞎填</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+</section>
+
+<section class="sheet" id="sheet-west" data-sheet="west">
+<h2 id="west">美西码头</h2>
+  <p class="co-lead">先看航线卸在哪一家，再看这家的闸口和属性。船期按 2026 年 10 月洛杉矶港、长滩港公布。周末闸口是 10 月 19–25 日这一周，下周以码头当天页面为准。某一水以 S/O 上的码头为准。</p>
+
+  <h3>航线 → 码头</h3>
+  <p class="co-lead">颜色按目的港码头的自动化 + 闸口宽窄（尤其周末能不能提）来标，方便选「建议推进」的产品。不是运价排序。</p>
+  <p class="leg"><i class="g"></i>绿·建议推进：自动化高，闸口相对宽　<i class="y"></i>黄·可用：工作日可提，周末常关或自动化中　<i class="o"></i>橙·慎选：自动化低且周末关（航程可以很快，提柜窗口窄）</p>
+  <div class="wrap">
+  <table class="mx">
+    <thead>
+      <tr><th>建议</th><th>船公司</th><th>产品 / 航线</th><th>卸货码头</th><th>港口</th><th>依据</th></tr>
+    </thead>
+    <tbody>
+      <tr class="rec-push"><td class="rec">建议推进</td><td>马士基、赫伯罗特</td><td>TP6、TP7、TP8、TP12</td><td>APM</td><td>洛杉矶</td><td>自动化高；当周周末仍有班</td></tr>
+      <tr class="rec-push"><td class="rec">建议推进</td><td>ONE、阳明、HMM</td><td>PS6</td><td>APM</td><td>洛杉矶</td><td>同上</td></tr>
+      <tr class="rec-push"><td class="rec">建议推进</td><td>达飞、中远、长荣、东方海外</td><td>海洋联盟 LOOP 5</td><td>APM</td><td>洛杉矶</td><td>同上</td></tr>
+      <tr class="rec-push"><td class="rec">建议推进</td><td>中远、东方海外、达飞、长荣</td><td>SEA、AAC4、SEA3</td><td>LBCT</td><td>长滩</td><td>自动化高</td></tr>
+      <tr class="rec-push"><td class="rec">建议推进</td><td>东方海外</td><td>AAC4（上海宁波表）</td><td>LBCT</td><td>长滩</td><td>自动化高</td></tr>
+      <tr class="rec-push"><td class="rec">建议推进</td><td>马士基</td><td>TPX</td><td>LBCT</td><td>长滩</td><td>自动化高</td></tr>
+      <tr class="rec-push"><td class="rec">建议推进</td><td>ONE、阳明、HMM</td><td>PS3、AL5、VSE</td><td>TraPac</td><td>洛杉矶</td><td>自动化高；闸口看当天页</td></tr>
+      <tr class="rec-push"><td class="rec">建议推进</td><td>以星</td><td>ZX2</td><td>TraPac</td><td>洛杉矶</td><td>自动化高</td></tr>
+      <tr class="rec-ok"><td class="rec">可用</td><td>达飞</td><td>EXX、EX1 等</td><td>Fenix</td><td>洛杉矶</td><td>自动化中；当周周末关</td></tr>
+      <tr class="rec-ok"><td class="rec">可用</td><td>达飞、中远、长荣、东方海外</td><td>海洋联盟 LOOP 1</td><td>Fenix</td><td>洛杉矶</td><td>同上</td></tr>
+      <tr class="rec-ok"><td class="rec">可用</td><td>达飞、中远、长荣、东方海外</td><td>LOOP 7 / HTW</td><td>Everport</td><td>洛杉矶</td><td>周六仅一班，周日关</td></tr>
+      <tr class="rec-ok"><td class="rec">可用</td><td>ONE、阳明、HMM</td><td>PS1、PS7</td><td>Yusen</td><td>洛杉矶</td><td>自动化中；当周周末关</td></tr>
+      <tr class="rec-ok"><td class="rec">可用</td><td>ONE、阳明、HMM</td><td>GS2；PS8（2026-09-03 起）</td><td>ITS</td><td>长滩</td><td>公用；周末不固定</td></tr>
+      <tr class="rec-ok"><td class="rec">可用</td><td>以星</td><td>ZEX</td><td>ITS</td><td>长滩</td><td>同上；盐田开</td></tr>
+      <tr class="rec-ok"><td class="rec">可用</td><td>中远、东方海外、达飞、长荣</td><td>AAC、CEN</td><td>PCT</td><td>长滩</td><td>周末不固定</td></tr>
+      <tr class="rec-ok"><td class="rec">可用</td><td>地中海</td><td>Orient、Swan、Pearl 等</td><td>TTI</td><td>长滩</td><td>自动化中；周末按当周</td></tr>
+      <tr class="rec-care"><td class="rec">慎选</td><td>美森</td><td>CLX、OLH</td><td>Pier C</td><td>长滩</td><td>航程快，但自动化低、周末关</td></tr>
+      <tr class="rec-care"><td class="rec">慎选</td><td>美森</td><td>MAX</td><td>Pier A</td><td>长滩</td><td>自动化低；周末不固定</td></tr>
+      <tr class="rec-care"><td class="rec">慎选</td><td>森罗</td><td>CPX</td><td>Pier A</td><td>长滩</td><td>同上</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <p class="cap">「建议推进」看的是到港后好不好提，不是越快越好。美森 CLX 航程短，但 Pier C 周末关，到仓窗口容易卡在周一。闸口以码头当周页面为准；某一水仍认 S/O 上的码头。</p>
+
+  <details>
+    <summary>港口位置原图</summary>
+    <div class="split-figs">
+      <figure>
+        <img src="北美海运_img/1_0_r3.png" alt="表内美西港口图">
+        <figcaption class="cap">表内原图。</figcaption>
+      </figure>
+      <figure>
+        <img src="北美海运_img/1_1_r3.png" alt="表内美西码头图">
+        <figcaption class="cap">表内原图。</figcaption>
+      </figure>
+    </div>
+  </details>
+
+  <h3>码头一览</h3>
+  <div class="dir-list">
+    <table class="mx">
+      <thead>
+        <tr><th>港口</th><th>码头</th><th>对应航线</th><th>属性</th><th>自动化</th><th>这一周闸口</th><th>备注</th></tr>
+      </thead>
+      <tbody>
+        <tr class="rec-push">
+          <td>洛杉矶</td><td>APM<br>Pier 400</td>
+          <td>马士基 / 赫伯罗特 TP6、TP7、TP8、TP12<br>ONE / 阳明 / HMM PS6<br>海洋联盟 LOOP 5</td>
+          <td>马士基码头，多家挂靠</td><td>高</td>
+          <td>周一至周六三班；周日一二班开、三班关</td>
+          <td>建议推进。<a href="https://www.apmterminals.com/en/los-angeles">网站</a></td>
+        </tr>
+        <tr>
+          <td>洛杉矶</td><td>Everport<br>226–236</td>
+          <td>长荣 HTW / 海洋联盟 LOOP 7<br>达飞、中远、长荣、东方海外共舱</td>
+          <td>长荣码头</td><td></td>
+          <td>周一至周五两班；周六一班；周日关</td>
+          <td>不是只卸长荣自有箱。<a href="https://www.etslink.com/">网站</a></td>
+        </tr>
+        <tr class="rec-ok">
+          <td>洛杉矶</td><td>Fenix<br>Pier 300</td>
+          <td>达飞 EXX、EX1<br>海洋联盟 LOOP 1</td>
+          <td>达飞码头</td><td>中</td>
+          <td>周一至周四两班；周五一班；周末关</td>
+          <td>可用。闸口以 Fenix 自己页面为准。<a href="https://www.fenixmarineservices.com/">网站</a></td>
+        </tr>
+        <tr class="rec-push">
+          <td>洛杉矶</td><td>TraPac<br>136–147</td>
+          <td>ONE / 阳明 / HMM：PS3、AL5、VSE<br>以星 ZX2</td>
+          <td>商船三井 51%</td><td>高</td>
+          <td>以码头当天页为准；冷柜仍要约</td>
+          <td>不是达飞，EXX 不在这里。<a href="https://losangeles.trapac.com/">网站</a></td>
+        </tr>
+        <tr>
+          <td>洛杉矶</td><td>Yusen<br>212–225</td>
+          <td>ONE / 阳明 / HMM：PS1、PS7</td>
+          <td>公用</td><td>中</td>
+          <td>这一周周六日关</td>
+          <td>PS8 已改挂长滩 ITS。<a href="https://yti.com/">网站</a></td>
+        </tr>
+        <tr>
+          <td>洛杉矶</td><td>WBCT 南区<br>100–103</td>
+          <td>中远体系挂靠；具体产品看当月船期</td>
+          <td>中远体系泊位</td><td></td>
+          <td>周一至周四两班；周五一班；周末关</td>
+          <td>不是中外运。<a href="https://voyagertrack.portsamerica.com">网站</a></td>
+        </tr>
+        <tr>
+          <td>洛杉矶</td><td>WBCT 北区<br>TiL 121–127</td>
+          <td>地中海 TiL 泊位；产品看当月船期</td>
+          <td>地中海码头公司</td><td></td>
+          <td>与南区同一张闸口表</td>
+          <td>不再写成阳明专属</td>
+        </tr>
+        <tr class="rec-push">
+          <td>长滩</td><td>LBCT<br>Pier E</td>
+          <td>海洋联盟 SEA、AAC4、SEA3<br>马士基 TPX</td>
+          <td>麦格理控股</td><td>高</td>
+          <td>按班次；周末看当周</td>
+          <td>建议推进。业主已不是 OOCL。<a href="https://www.lbct.com/">网站</a></td>
+        </tr>
+        <tr class="rec-care">
+          <td>长滩</td><td>SSA Pier A</td>
+          <td>美森 MAX<br>森罗 CPX<br>SeaLead / 高丽</td>
+          <td>公用</td><td>低</td>
+          <td>10 月 17–18 日那周全关</td>
+          <td>慎选。<a href="https://piera.tideworks.com/">网站</a></td>
+        </tr>
+        <tr class="rec-care">
+          <td>长滩</td><td>SSA Pier C</td>
+          <td>美森 CLX、OLH</td>
+          <td>美森正班</td><td>低</td>
+          <td>周末关</td>
+          <td>慎选：航程快，周末难提。<a href="https://m60.tideworks.com/">网站</a></td>
+        </tr>
+        <tr class="rec-ok">
+          <td>长滩</td><td>TTI<br>Pier T</td>
+          <td>地中海 Orient、Swan、Pearl 等</td>
+          <td>地中海为主</td><td>中</td>
+          <td>周末按当周</td>
+          <td>可用。<a href="https://www.ttilgb.com/">网站</a></td>
+        </tr>
+        <tr class="rec-ok">
+          <td>长滩</td><td>ITS<br>Pier G</td>
+          <td>ONE / 阳明 / HMM GS2<br>ONE PS8（2026-09-03 起）<br>以星 ZEX</td>
+          <td>Premier 为主公用</td><td></td>
+          <td>10 月 24 日第一班开过</td>
+          <td>可用。<a href="https://www.itslb.com/">网站</a></td>
+        </tr>
+        <tr class="rec-ok">
+          <td>长滩</td><td>PCT<br>Pier J</td>
+          <td>海洋联盟 AAC、CEN<br>达飞 / 马士基沿岸支线</td>
+          <td>公用</td><td></td>
+          <td>10 月 17–18 日那周全关</td>
+          <td>可用。<a href="https://pct.tideworks.com/">网站</a></td>
+        </tr>
+      </tbody>
+    </table>
+    <p class="cap">一条船停多久看箱量、桥吊和泊位窗口，不能用 10000/(30×24×5) 推成「停 2.8 天」。</p>
+  </div>
+  <details>
+    <summary>美西补充原图</summary>
+    <figure>
+      <img src="北美海运_img/1_3_r35.png" alt="表内美西补充图">
+      <figcaption class="cap">表内原图。</figcaption>
+    </figure>
+  </details>
+
+  <h3 class="hho">HHO 视角</h3>
+  <p class="hho-note">关注点：这一环出问题能不能当天感知；会不会把「柜延误」说成「已经断货」；ETA / 预约 / 可售有没有拆开。知识库：履约看板异常闭环、FBA 预约与库存风险、头程提前感知。</p>
+  <div class="wrap">
+  <table class="mx">
+    <thead>
+      <tr><th>潜在风险</th><th>应该怎么应对</th><th>目前怎么应对</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>选了快船但周末闸口关，提柜窗口卡在周一，堆存照走</td><td>选产品同时看码头自动化和当周周末闸口；S/O 码头变了当天重算</td><td>美西 sheet 用绿/黄/橙标建议；闸口以码头当周页为准，不自动告警</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+</section>
+<section class="sheet" id="sheet-east" data-sheet="east">
+<h2 id="east">美东码头</h2>
+  <p class="co-lead">先看航线卸在哪一家，再看这家的自动化、预约和免费期。纽约–新泽西六家；美东没有美西那种港务局一览能把产品钉死到码头，亚洲干线卸哪一家以这一水 S/O 为准。GCT 已改名 Port Liberty（达飞业主）。没有 PierPass。2026 年港口设施费每个载货标箱 14.80 美元，空箱不收。闸口与预约以码头当天页面为准。</p>
+
+  <h3>航线 → 码头</h3>
+  <p class="co-lead">颜色按目的港码头的自动化 + 提柜好不好约（有无预约、免费期规则清不清）来标，方便选「建议推进」的产品。不是运价排序，也不是航程越短越好。</p>
+  <p class="leg"><i class="g"></i>绿·建议推进：自动化高或普柜好提，规则清楚　<i class="y"></i>黄·可用：能提，但要约/窗口窄或自动化中　<i class="o"></i>橙·慎选：不是亚洲干线主卸点，或窗口太窄</p>
+  <div class="wrap">
+  <table class="mx">
+    <thead>
+      <tr><th>建议</th><th>船公司</th><th>产品 / 航线</th><th>卸货码头</th><th>港口</th><th>依据</th></tr>
+    </thead>
+    <tbody>
+      <tr class="rec-push"><td class="rec">建议推进</td><td>马士基、赫伯罗特</td><td>Gemini 美东（上海约 33 天、宁波约 38 天那档）</td><td>APM Elizabeth</td><td>纽约–新泽西</td><td>自动化高；TERMPoint 清晰；免费期内约不到可挪 LFD</td></tr>
+      <tr class="rec-push"><td class="rec">建议推进</td><td>中远、东方海外、长荣、达飞等</td><td>海洋联盟美东（常见挂 Maher）</td><td>Maher</td><td>纽约–新泽西</td><td>港内最大公用；普柜不预约；某一水仍认 S/O</td></tr>
+      <tr class="rec-ok"><td class="rec">可用</td><td>ONE、阳明、HMM</td><td>EC1 等 Premier 美东</td><td>以 S/O 为准</td><td>纽约–新泽西</td><td>美东无港务局「产品→码头」死表；订舱时确认卸港码头</td></tr>
+      <tr class="rec-ok"><td class="rec">可用</td><td>达飞</td><td>达飞美东航线</td><td>Port Liberty Bayonne</td><td>纽约–新泽西</td><td>业主达飞、公用非专属；上午要约 PortTruckPass</td></tr>
+      <tr class="rec-ok"><td class="rec">可用</td><td>达飞</td><td>达飞美东航线</td><td>Port Liberty New York</td><td>纽约–新泽西</td><td>无统一预约制；港内集中查验点在此</td></tr>
+      <tr class="rec-ok"><td class="rec">可用</td><td>地中海</td><td>地中海美东航线</td><td>PNCT</td><td>纽约–新泽西</td><td>TIL 是股东；公用，不写成只卸 PNCT</td></tr>
+      <tr class="rec-ok"><td class="rec">可用</td><td>中远、东方海外、长荣、达飞等</td><td>海洋联盟美东（改挂 Port Liberty 时）</td><td>Port Liberty Bayonne / New York</td><td>纽约–新泽西</td><td>改挂以新 S/O 为准，不默认仍是 Maher</td></tr>
+      <tr class="rec-care"><td class="rec">慎选</td><td>Seaboard</td><td>冷货支线</td><td>Red Hook</td><td>纽约–新泽西</td><td>不是亚洲干线主卸点；窗口窄</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <p class="cap">「建议推进」看的是到港后好不好提，不是航程短就好。订舱确认上的目的港码头，比「这家船公司通常卸哪」更准。船期改挂码头时，以新 S/O 为准，并当天重算预约与到仓日。</p>
+
+  <details>
+    <summary>港口位置原图</summary>
+    <figure>
+      <img src="北美海运_img/1_2_r44.png" alt="表内美东港口图">
+      <figcaption class="cap">表内原图。</figcaption>
+    </figure>
+  </details>
+
+  <h3>码头一览</h3>
+  <div class="dir-list">
+    <table class="mx">
+      <thead>
+        <tr><th>港口</th><th>码头</th><th>对应航线</th><th>属性</th><th>自动化</th><th>闸口 / 预约</th><th>备注</th></tr>
+      </thead>
+      <tbody>
+        <tr class="rec-push">
+          <td>纽约–新泽西</td><td>APM Elizabeth</td>
+          <td>马士基 / 赫伯罗特 Gemini 美东为主</td>
+          <td>马士基，租约至 2062</td><td>高</td>
+          <td>TERMPoint 预约（超限、框架捆除外）。工作日 6:00 起十个一小时窗</td>
+          <td>建议推进。干箱免费 4 天；冷柜/特种 2 天。免费期内约不到，LFD 挪到下一个有名额日。<a href="https://www.apmterminals.com/en/port-elizabeth">网站</a></td>
+        </tr>
+        <tr class="rec-push">
+          <td>纽约–新泽西</td><td>Maher</td>
+          <td>海洋联盟等多家公用；以 S/O 为准</td>
+          <td>麦格理，租约至 2063-09</td><td>中</td>
+          <td>普通拖车不预约；超限吊机要约</td>
+          <td>建议推进。干箱 4 个开门日；冷柜/特种 2 天。<a href="https://www.maherterminals.com/">网站</a></td>
+        </tr>
+        <tr class="rec-ok">
+          <td>纽约–新泽西</td><td>PNCT</td>
+          <td>地中海常见；多家公用。TIL 是股东</td>
+          <td>Ports America + TIL，租约至 2050</td><td></td>
+          <td>普通进出多不预约。工作日为主，偶尔周六</td>
+          <td>可用。干箱 4 个工作日；冷柜/框架/开顶 2 天。<a href="https://www.pnct.net/">网站</a></td>
+        </tr>
+        <tr class="rec-ok">
+          <td>纽约–新泽西</td><td>Port Liberty Bayonne</td>
+          <td>达飞美东常见；多家公用</td>
+          <td>达飞（原 GCT Bayonne）</td><td>中</td>
+          <td>6:00–13:00 PortTruckPass 预约；13:00–16:00 不预约</td>
+          <td>可用。干箱 4 天。业主是达飞，不是达飞专属舱。</td>
+        </tr>
+        <tr class="rec-ok">
+          <td>纽约–新泽西</td><td>Port Liberty New York</td>
+          <td>达飞体系；多家公用</td>
+          <td>达飞（原 GCT New York）</td><td>中</td>
+          <td>普通进出无统一预约制。工作日 6:00–16:00</td>
+          <td>可用。干箱 4 天。港内集中查验点在这里。</td>
+        </tr>
+        <tr class="rec-care">
+          <td>纽约–新泽西</td><td>Red Hook</td>
+          <td>Seaboard 冷货；滚装另计</td>
+          <td>支线 / 冷货</td><td></td>
+          <td>工作日 8–12、13–17</td>
+          <td>慎选：不作亚洲干线主提柜点。</td>
+        </tr>
+      </tbody>
+    </table>
+    <p class="cap">免费期按码头自己的「工作日 / 开门日」计，关门日通常不计。自己用卸船日加 4 天会算早。洛杉矶 TraPac「约不到不挪 LFD」；纽约 APM「免费期内约不到可挪」——不要混用。</p>
+  </div>
+
+  <h3 class="hho">HHO 视角</h3>
+  <p class="hho-note">关注点：这一环出问题能不能当天感知；会不会把「柜延误」说成「已经断货」；ETA / 预约 / 可售有没有拆开。知识库：履约看板异常闭环、FBA 预约与库存风险、头程提前感知。</p>
+  <div class="wrap">
+  <table class="mx">
+    <thead>
+      <tr><th>潜在风险</th><th>应该怎么应对</th><th>目前怎么应对</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>选了产品但卸港码头要约或窗口窄，堆存照走；或把美西「约不到不挪 LFD」套到纽约 APM</td><td>选产品同时看码头自动化、预约制和免费期规则；S/O 码头变了当天重算</td><td>美东 sheet 用绿/黄/橙标建议；闸口以码头当天页为准，不自动告警</td></tr>
+      <tr><td>美东航线经巴拿马，枯水限吃水/减槽位导致晚到，计划仍按美西节奏</td><td>订美东时把运河排队和吃水进交付情景；ETA 漂出就当天改约</td><td>运河风险写在「在途」；没有自动读 ACP 通告的任务</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+</section>
+
+<section class="sheet" id="sheet-time" data-sheet="time">
+  <h2 id="time">时效：宁波 → LA 就近上架</h2>
+  <p class="co-lead">只算一条地理线：宁波开 → 洛杉矶/长滩到港 → <strong>就近</strong>送南加海外仓（无忧达 CA 仓群）或就近 FBA。不含北加/德州长拖。天数是情景估计，不是合同承诺。</p>
+  <p class="leg"><i class="ideal"></i><span class="tag ideal">理想</span> 优秀冲刺（国内 7 天）　<i class="common"></i><span class="tag common">常见</span> 排产默认　<i class="watch"></i><span class="tag watch">关注</span> 接近线　<i class="bad"></i><span class="tag bad">超线</span> 掉水/爆仓</p>
+  <p class="cap">颜色语义全页共用。绿是冲刺情景，不是默认排产；排产用蓝（常见）。订舱「提前约 30 天」= 尽早占舱，≠ 确认后只要 7 天。</p>
+
+  <h3>场景范围</h3>
+  <div class="wrap">
+  <table class="mx">
+    <thead>
+      <tr><th>终点</th><th>指哪里</th><th>本页用的仓例</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>就近海外仓</td>
+        <td>无忧达报价「CA 仓群（美西）」；洛杉矶港区短拖</td>
+        <td>仓码 CAJW* / CAXX*（如 CAJW05、CAJW06、CAXX01）。以入库单 destWarehouse 为准</td>
+      </tr>
+      <tr>
+        <td>就近 FBA</td>
+        <td>建货件分到南加/内陆帝国一带 FC（ONT、LGB、SBD、POC 等），仍认标签仓码</td>
+        <td>约仓松紧看长河该仓码；不把北加 SCK8 算进「就近」</td>
+      </tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h3>1、国内段（订舱 → 装柜 → 进港 → 离港）</h3>
+  <p class="co-lead">本页理想情景把「订舱确认 + 放箱装柜 + 转运进港到离港」合计按 <strong>7 天</strong> 算。</p>
+  <div class="panel">
+    <p><strong>7 天算不算优秀？算——偏紧的优秀值，不是日常中位数。</strong></p>
+    <p>对照订舱 sheet：建议开船前约 30 天完成订舱；一代常见 ETD 前 3–4 周能订稳；开港常见 ETD 前 5–7 天；截港常见 ETD 前 1–3 天。把「确认舱位到 ATD」压进 7 天，等于舱已有、工厂当天能装、车和开港窗口对齐、资料一次过——平季近厂偶发能做到，不能当排产默认。日常更常见是确认后约 14–21 天才开船；按建议提前量则港前日历跨度约 21–30 天。</p>
+    <p>因此：下面总览的「理想」行用国内 7 天；「常见」行国内改按约 14–21 天，避免把优秀值当成常态。</p>
+  </div>
+  <div class="wrap">
+  <table class="mx">
+    <thead>
+      <tr><th>国内子步骤（理想 7 天内）</th><th>怎么挤进 7 天</th><th>一破就要加天</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>订舱确认</td><td>当天或次日书面 S/O（船名航次 ETD 码头已定）</td><td>改船、无放箱、舱位待确认</td></tr>
+      <tr><td>提空 + 工厂装柜铅封</td><td>1–2 天内装完；八步确认齐</td><td>厂远、等货、缺确认、验箱不合格</td></tr>
+      <tr><td>开港进港 + 截单 VGM</td><td>开港后马上进；截点一次过</td><td>未开港只能落箱等；截港未进 → 掉水</td></tr>
+      <tr><td>装船离港</td><td>认 ATD；理想是确认后第 7 天前后离港</td><td>进港未装船、甩柜</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h3>2、海运 + LA 港后就近上架</h3>
+  <div class="wrap">
+  <table class="mx">
+    <thead>
+      <tr><th>环节</th><th>理想</th><th>常见</th><th>关注 / 超线</th><th>依据</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>海运宁波 → LA/LB</td>
+        <td class="ideal">约 12–14 天</td>
+        <td class="common">约 14–16 天</td>
+        <td><span class="tag watch">关注</span> ETA 偏 ≥1 天写日报　<span class="tag bad">超线</span> ≥3 天标延误</td>
+        <td><span class="src-tag">观察</span> 订舱表 2026-10</td>
+      </tr>
+      <tr>
+        <td>靠港 → 可提 → 短拖到仓</td>
+        <td class="ideal">约 2–4 天</td>
+        <td class="common">约 3–6 天</td>
+        <td><span class="tag watch">关注</span> LFD 剩 2 天仍不可提　<span class="tag bad">超线</span> 提柜后 &gt;3 天无送仓</td>
+        <td><span class="src-tag">观察</span> 长河美西港后</td>
+      </tr>
+      <tr>
+        <td>无忧达 CA 收货 → 上架</td>
+        <td class="ideal">约 1–2 天</td>
+        <td class="common">约 1–3 天</td>
+        <td><span class="tag watch">关注</span> 到仓 &gt;3 天未收　<span class="tag bad">超线</span> 收货后 &gt;5 天未上架</td>
+        <td><span class="src-tag">合同+API</span> 无忧达</td>
+      </tr>
+      <tr>
+        <td>就近 FBA：约仓 + 可售</td>
+        <td class="ideal">约仓短约 3–7 天+</td>
+        <td class="common">约仓约 5–10 天+</td>
+        <td><span class="tag watch">关注</span> 约仓 &gt;10 天　<span class="tag bad">超线</span> 爆仓 / 窗口过未可售</td>
+        <td><span class="src-tag">观察</span> 长河南加；货件状态</td>
+      </tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h3>3、全链路合计（订舱确认 → 上架）</h3>
+  <p class="co-lead">条形按「国内 / 海运 / 港后」分段。理想条用国内 7；常见条用国内中位约 17（落在 14–21 内）。长度按约 50 天满格示意，不是精确比例尺。</p>
+  <div class="bar-wrap">
+    <div class="bar-row">
+      <div><span class="tag ideal">理想</span> CA 仓</div>
+      <div class="bar-track" title="国内7 + 海运14 + 港后4 ≈ 25"><span class="b-dom" style="width:14%"></span><span class="b-sea" style="width:28%"></span><span class="b-wh" style="width:8%"></span></div>
+      <div class="pill-ideal">~25 天</div>
+    </div>
+    <div class="bar-row">
+      <div><span class="tag common">常见</span> CA 仓</div>
+      <div class="bar-track common" title="国内17 + 海运14 + 港后5 ≈ 36"><span class="b-dom" style="width:34%"></span><span class="b-sea" style="width:28%"></span><span class="b-wh" style="width:10%"></span></div>
+      <div class="pill-common">~36 天</div>
+    </div>
+    <div class="bar-row">
+      <div><span class="tag ideal">理想</span> 就近 FBA</div>
+      <div class="bar-track" title="国内7 + 海运14 + 约仓收货9 ≈ 30"><span class="b-dom" style="width:14%"></span><span class="b-sea" style="width:28%"></span><span class="b-wh" style="width:18%"></span></div>
+      <div class="pill-ideal">~30 天</div>
+    </div>
+    <div class="bar-row">
+      <div><span class="tag common">常见</span> 就近 FBA</div>
+      <div class="bar-track common" title="国内17 + 海运14 + 约仓收货12 ≈ 43"><span class="b-dom" style="width:34%"></span><span class="b-sea" style="width:28%"></span><span class="b-wh" style="width:24%"></span></div>
+      <div class="pill-common">~43 天</div>
+    </div>
+    <p class="cap" style="margin:4px 0 0">绿段国内　蓝段海运　黄段港后（提送/约仓/上架）</p>
+  </div>
+  <div class="wrap">
+  <table class="mx">
+    <thead>
+      <tr><th>路径</th><th>理想（国内 7）</th><th>常见（国内 14–21）</th><th>关注 / 超线</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>宁波 → LA → 无忧达 CA 上架</td>
+        <td class="ideal">约 22–27 天</td>
+        <td class="common">约 32–43 天</td>
+        <td><span class="tag watch">关注</span> 全链路 &gt;45 天拆环节　<span class="tag bad">超线</span> 截港未进或甩柜</td>
+      </tr>
+      <tr>
+        <td>宁波 → LA → 就近 FBA 可售</td>
+        <td class="ideal">约 26–35 天</td>
+        <td class="common">约 38–50 天</td>
+        <td><span class="tag watch">关注</span> 约仓 &gt;10 天　<span class="tag bad">超线</span> 爆仓空等 / 窗口过仍未可售</td>
+      </tr>
+    </tbody>
+  </table>
+  </div>
+  <p class="cap">理想行建立在国内 7 天优秀值上；排产默认用常见列。辅钟（仅 ATD→上架）：CA 约 17–23 天；就近 FBA 约 21–30 天——只给在途对账；全周期看上表。</p>
+
+  <h3>4、海外仓 vs 就近 FBA（同一宁波→LA 船）</h3>
+  <div class="wrap">
+  <table class="mx">
+    <thead>
+      <tr><th></th><th>无忧达 CA</th><th>就近 FBA</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>国内 + 海运</td><td colspan="2">相同（同一水）</td></tr>
+      <tr><td>港后差在哪</td><td>短拖 + 仓预约 ±3h + 清点上架</td><td>Carrier Central 约仓 + 收货可售；可变段更长</td></tr>
+      <tr><td>完成标志</td><td>launchTime / 上架完成</td><td>库存可售（不是仅「已送达」）</td></tr>
+      <tr><td>盯什么</td><td>destWarehouse=CA*；预约时段；收货/上架时间</td><td>货件 FC 码；该仓约仓天数；货件状态</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h3 class="hho">HHO 视角</h3>
+  <p class="hho-note">关注点：理想 7 天国内有没有当成默认；就近 CA/FBA 有没有和北加长拖混谈；到仓≠可售。</p>
+  <div class="wrap">
+  <table class="mx">
+    <thead>
+      <tr><th>潜在风险</th><th>应该怎么应对</th><th>目前怎么应对</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>用国内 7 天优秀值排所有计划，工厂或开港一对不齐就掉水</td>
+        <td>计划默认用「常见」列；7 天只作冲刺情景并写明前提（舱齐、厂近、开港对齐）</td>
+        <td>本页已标注 7 天为优秀值；计划表是否分开理想/常见，待业务沿用</td>
+      </tr>
+      <tr>
+        <td>把北加爆仓仓或长拖算进「LA 就近」周期</td>
+        <td>就近只认 CA 仓群或南加 FC；其他仓另开情景</td>
+        <td>无忧达库存可见 CAJW05/06 等；目的仓以入库单为准</td>
+      </tr>
+    </tbody>
+  </table>
+  </div>
+
+</section>
+
+<section class="sheet" id="sheet-terms" data-sheet="terms">
+  <h2 id="terms">名称解析</h2>
+  <p class="co-lead">同一套字段：名称、是什么、日常怎么用。按订舱 → 做箱装柜 → 装船在途 → 港后排列。</p>
+
+  <h3>订舱与船期</h3>
+  <div class="wrap">
+  <table class="mx">
+    <thead>
+      <tr><th>名称</th><th>是什么</th><th>日常怎么用</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>S/O</td>
+        <td>Shipping Order，订舱确认。船公司或货代确认这一水舱位后发给你的凭证</td>
+        <td>核对船名、航次、ETD、起运港、目的港、箱型、约号、目的港码头，以及截单、截港、截关、VGM。后面做箱、进港都认这一张</td>
+      </tr>
+      <tr>
+        <td>船名 / 航次</td>
+        <td>这一水船的名字，以及这一趟航次编号</td>
+        <td>写进计划表。变了当天改交付和预约。对跟踪、提单、日报时，船名航次要对上</td>
+      </tr>
+      <tr>
+        <td>ETD</td>
+        <td>Estimated Time of Departure，计划离港日</td>
+        <td>订舱时就有。用来排开港、截港和工厂装柜。不能当成船已经开走</td>
+      </tr>
+      <tr>
+        <td>ATD</td>
+        <td>Actual Time of Departure，实际离港</td>
+        <td>履约认这一水走了的时点。有装船节点，且离港时间已过，或 AIS 显示在航，才算 ATD</td>
+      </tr>
+      <tr>
+        <td>ETA</td>
+        <td>Estimated Time of Arrival，预计到港</td>
+        <td>在途盯这个。改一天，仓库和 FBA 预约当天改。不要沿用订舱时的旧 ETA</td>
+      </tr>
+      <tr>
+        <td>ATA</td>
+        <td>Actual Time of Arrival，实际靠港</td>
+        <td>船靠上了。还不能提货。提货要等卸进堆场、进口放行、船公司放货、码头预约</td>
+      </tr>
+      <tr>
+        <td>截单 / SI</td>
+        <td>补料截止。舱单资料交给船公司的最晚时点</td>
+        <td>写在 S/O 上。过了截单，舱单改不动或要改船。宁波、上海、不同船公司小时不一样</td>
+      </tr>
+      <tr>
+        <td>截港 / CY cutoff</td>
+        <td>重箱最晚进码头闸口的时点</td>
+        <td>做箱的硬闸口。开港后、截港前把重箱送进去。过了截港，这一水正常闸口不再收</td>
+      </tr>
+      <tr>
+        <td>截关</td>
+        <td>海关放行要赶上的时点</td>
+        <td>和截港不是同一件事。进场看截港，放行看截关。两边都过了，才谈得上配船</td>
+      </tr>
+      <tr>
+        <td>VGM</td>
+        <td>Verified Gross Mass，核实后的整箱毛重</td>
+        <td>截点写在确认上。不交或错了，码头可以不收箱或不装船</td>
+      </tr>
+      <tr>
+        <td>甩柜</td>
+        <td>已订的舱，这只箱没上这一水，改到后面的船</td>
+        <td>超订、改船期、晚于截港都会甩。当天改交付、改配下一水，并问有没有亏舱费</td>
+      </tr>
+      <tr>
+        <td>亏舱费</td>
+        <td>舱订了又不用，过了约定取消时点，货代收的违约金</td>
+        <td>订舱时写明多久可以无责取消、能不能挪后一水。没写进确认，事后才知道金额</td>
+      </tr>
+      <tr>
+        <td>保舱</td>
+        <td>和货代约定这一水尽量不被甩，运价通常更高</td>
+        <td>只有书面写了不甩柜才算。口头或「优先」不算保证</td>
+      </tr>
+      <tr>
+        <td>空班 / blank sailing</td>
+        <td>船公司主动取消某一班，这一周少挂靠</td>
+        <td>看挂靠数变少时，先问是不是空班。舱位紧不紧还要和运价、准班一起看</td>
+      </tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h3>做箱与装柜</h3>
+  <div class="wrap">
+  <table class="mx">
+    <thead>
+      <tr><th>名称</th><th>是什么</th><th>日常怎么用</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>开港</td>
+        <td>码头开始收这一水重箱的时点。常见在 ETD 前 5–7 天</td>
+        <td>开港前可以提空、装货，重箱进不去闸口。开港后到截港之间送重箱</td>
+      </tr>
+      <tr>
+        <td>放箱 / 打单</td>
+        <td>船公司或货代放空箱额度，并给出提空单</td>
+        <td>有放箱才能去堆场提空。旺季额度紧，要盯当天能不能提到</td>
+      </tr>
+      <tr>
+        <td>提空 / 验箱</td>
+        <td>从堆场提出空箱，并检查箱况</td>
+        <td>量内高、看破损潮湿。坏箱在堆场换，不要拉到工厂才发现</td>
+      </tr>
+      <tr>
+        <td>预提</td>
+        <td>开船前较早把空箱提出来。免费用箱从提空当天算</td>
+        <td>旺季可提前 2–3 天提空抢箱。超时按船公司 demurrage/detention 价目。重箱仍必须截港前进港</td>
+      </tr>
+      <tr>
+        <td>落箱</td>
+        <td>重箱或空箱先落在港外堆场，等开港或等闸口</td>
+        <td>开港前做完的重箱只能港外落。落箱费是市场价，当天问堆场</td>
+      </tr>
+      <tr>
+        <td>铅封 / 封号</td>
+        <td>箱门上的铅封条及其号码</td>
+        <td>写入舱单、提单。装柜最后一步拍清，群里「封柜 OK」司机才走。封号错了，进港会对不上</td>
+      </tr>
+      <tr>
+        <td>装柜八步</td>
+        <td>工厂装柜的核对顺序：标签、商品、车辆、箱况、清单、装货照片、数量、封柜</td>
+        <td>汇一、持创同一套。每步等群里书面确认。没有确认就往下做，费用由工厂承担</td>
+      </tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h3>装船与出口清关</h3>
+  <div class="wrap">
+  <table class="mx">
+    <thead>
+      <tr><th>名称</th><th>是什么</th><th>日常怎么用</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>进港 / 进门</td>
+        <td>重箱进入出口码头闸口</td>
+        <td>进门后才有运抵。进港不等于装船，箱子先落出口堆场</td>
+      </tr>
+      <tr>
+        <td>运抵</td>
+        <td>海关系统确认箱子已到码头监管场所</td>
+        <td>运抵之后海关才能放行。看节点时间，不要和进门混成一步</td>
+      </tr>
+      <tr>
+        <td>海关放行</td>
+        <td>出口报关审结，允许装船</td>
+        <td>放行后还要无纸化比对。放行了仍可能没配上这一水</td>
+      </tr>
+      <tr>
+        <td>比对通过</td>
+        <td>舱单、报关、箱封等数据对上</td>
+        <td>通过才允许配进这一水。没通过不能配船，查验会再拖</td>
+      </tr>
+      <tr>
+        <td>配载</td>
+        <td>船公司决定这只箱进不进这一水的积载计划</td>
+        <td>没叫到这只箱，就留在堆场改下一水。进港、放行都挡不住甩柜</td>
+      </tr>
+      <tr>
+        <td>装船</td>
+        <td>岸桥把箱子吊上船</td>
+        <td>有装船时刻只说明箱上了船。船可能还在继续装别的柜，要以 ATD 认开走</td>
+      </tr>
+      <tr>
+        <td>直装</td>
+        <td>箱子不进堆场，车到岸边直接吊上船</td>
+        <td>要船已靠泊且码头另准。美线常态是先落堆场，不要按直装排计划</td>
+      </tr>
+      <tr>
+        <td>加载 / 晚集港</td>
+        <td>截港后，船公司临时放几只指定箱再进闸</td>
+        <td>黄牛卖的是还能不能进这扇闸。进了不等于装上。费用另谈，没有统一价目</td>
+      </tr>
+      <tr>
+        <td>ISF</td>
+        <td>Importer Security Filing，进口商安保申报</td>
+        <td>进口商在起运港装船前至少 24 小时申报。不是到港前 3–5 天的习惯说法</td>
+      </tr>
+      <tr>
+        <td>AMS</td>
+        <td>船公司或 NVOCC 向美国海关的舱单申报</td>
+        <td>大约在起运港装船前 24 小时。和 ISF 是两套，不要混</td>
+      </tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h3>港后提货与费用钟</h3>
+  <div class="wrap">
+  <table class="mx">
+    <thead>
+      <tr><th>名称</th><th>是什么</th><th>日常怎么用</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>卸船 / 进堆场</td>
+        <td>箱子从船上卸到码头堆场</td>
+        <td>已卸还不能提。可提要同时有进口放行、船公司放货、无 hold、码头费用结清，多数洛杉矶/长滩还要预约</td>
+      </tr>
+      <tr>
+        <td>最后免费日 / LFD</td>
+        <td>Last Free Day，码头堆存免费期的最后一天</td>
+        <td>以这一家码头系统里写的为准。不要自己用卸船日加 4 天。剩 2 天仍不可提或没预约，当天报</td>
+      </tr>
+      <tr>
+        <td>Demurrage（码头堆存）</td>
+        <td>免费期过后，重箱还在码头里按天收的堆存</td>
+        <td>从 LFD 之后起算，重箱出闸口停。TraPac 洛杉矶普柜常见免费 4 天。账单名以船公司发票为准</td>
+      </tr>
+      <tr>
+        <td>Per diem（用箱）</td>
+        <td>重箱提出码头后，船公司免费用箱天数用完仍未还空的按天费</td>
+        <td>空箱还进当天收这一箱型的地点才停。还空点不收，时钟继续走</td>
+      </tr>
+      <tr>
+        <td>车架 / chassis</td>
+        <td>拖柜用的底盘车架</td>
+        <td>美西南 DCLI 公布价约每天 47.50 美元。车架提出那天起算，还回车架公司地点才停。还空点关门，车架费照算</td>
+      </tr>
+      <tr>
+        <td>预约 / appointment</td>
+        <td>码头规定提柜、还空要先约时间窗</td>
+        <td>跟这一家码头走。美森 Pier C 等专用码头习惯可能不同，以当天闸口为准</td>
+      </tr>
+      <tr>
+        <td>还空表 / empty board</td>
+        <td>码头按船公司、箱型公布当天收不收空箱</td>
+        <td>提柜次日看。不收就当天报，不等账单。不要假定还能还回提柜那家码头</td>
+      </tr>
+      <tr>
+        <td>船公司放货</td>
+        <td>运费和放单手续做完，允许提柜</td>
+        <td>没有放货，码头不给出闸。和海关进口放行是两件事</td>
+      </tr>
+      <tr>
+        <td>专用码头 / 公用码头</td>
+        <td>某船公司体系经营的码头，或对多家船公司开放的码头</td>
+        <td>订舱时定下卸哪一家。周末闸口、要不要预约、免费期算法都跟这家走</td>
+      </tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h3>角色</h3>
+  <div class="wrap">
+  <table class="mx">
+    <thead>
+      <tr><th>名称</th><th>是什么</th><th>日常怎么用</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>船公司</td>
+        <td>经营船舶和舱位的承运人</td>
+        <td>认船期、放箱、装船、提单、目的港放货。跟踪以船公司或货代系统为准</td>
+      </tr>
+      <tr>
+        <td>货代</td>
+        <td>订舱、做箱、单证的中间服务方。一级直接对船公司，二级再转一手</td>
+        <td>日常对接舱位、截点、进港状态。履约中台货代表目前接了互邦和长河</td>
+      </tr>
+      <tr>
+        <td>港口 / 码头</td>
+        <td>港口是港务当局范围；码头是具体经营闸口、堆场、岸桥的公司</td>
+        <td>美国码头是企业经营。船靠哪一家码头，订舱时已定，提柜规则跟这家</td>
+      </tr>
+      <tr>
+        <td>堆场</td>
+        <td>港内或港外存放空箱、重箱的场地</td>
+        <td>提空、落箱、出口进港后落场，都在堆场。开港前重箱常落港外堆场</td>
+      </tr>
+      <tr>
+        <td>拖车行</td>
+        <td>负责提空、送厂、进港、目的港提柜送仓的车队</td>
+        <td>国内段盯截港前能否进场；美国段盯预约、车架和还空</td>
+      </tr>
+      <tr>
+        <td>报关行</td>
+        <td>做出口或进口报关的代理</td>
+        <td>出口卡放行，进口卡提货放行。报关行不订舱</td>
+      </tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h3 class="hho">HHO 视角</h3>
+  <p class="hho-note">关注点：这一环出问题能不能当天感知；会不会把「柜延误」说成「已经断货」；ETA / 预约 / 可售有没有拆开。知识库：履约看板异常闭环、FBA 预约与库存风险、头程提前感知。</p>
+  <div class="wrap">
+  <table class="mx">
+    <thead>
+      <tr><th>潜在风险</th><th>应该怎么应对</th><th>目前怎么应对</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>同一词在货代、船司、计划表含义不同，导致误报已到港/已上架</td><td>认本页字段定义；到港≠可提≠可售；写进度先引货代「目前状态」再叠系统字段</td><td>名称解析表已对齐；进度文案是否引用备注，靠写日报的人执行</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+</section>
+<section class="sheet" id="sheet-risk" data-sheet="risk">
+<h2 id="risk">风险与应对</h2>
+  <p class="co-lead">先看覆盖度总表（与总览摘要一致）。细则在下方折叠，按节点执行。各 sheet 的「HHO 视角」是同一套口径的操作版。</p>
+
+  <p class="leg"><i class="okc"></i>已控　<i class="midc"></i>半控　<i class="gapc"></i>缺口</p>
+  <div class="wrap">
+  <table class="mx">
+    <thead>
+      <tr><th>节点</th><th>核心风险</th><th>应对原则</th><th>覆盖</th><th>跳转</th></tr>
+    </thead>
+    <tbody>
+      <tr class="cov-ok">
+        <td>订舱</td>
+        <td>甩柜、改船、码头变了计划未改</td>
+        <td>认 S/O；变了当天重算；中台爬宁波未来船期</td>
+        <td><span class="tag ok">已控</span></td>
+        <td><a href="#book">订舱</a></td>
+      </tr>
+      <tr class="cov-mid">
+        <td>做箱 / 装船</td>
+        <td>截港未进；进港未离</td>
+        <td>认进港与 ATD；部分船司可分节点（常晚 2 天）</td>
+        <td><span class="tag mid">半控</span></td>
+        <td><a href="#stuff">做箱</a> · <a href="#load">装船</a></td>
+      </tr>
+      <tr class="cov-ok">
+        <td>在途</td>
+        <td>ETA 漂、换船；美东运河枯水/排队</td>
+        <td>工作日早报；差 1 天进日报；≥3 天标延误；问 booked transit</td>
+        <td><span class="tag ok">已控</span></td>
+        <td><a href="#sea">在途</a></td>
+      </tr>
+      <tr class="cov-mid">
+        <td>提柜</td>
+        <td>已卸不可提，堆存空转</td>
+        <td>日报：LFD 代理剩≤2 天 P0（免费 4 天）；码头真 LFD / 预约未接入 → 半控</td>
+        <td><span class="tag mid">半控</span></td>
+        <td><a href="#dest">清关提货</a></td>
+      </tr>
+      <tr class="cov-mid">
+        <td>送仓</td>
+        <td>约仓与海运 ETA 脱节</td>
+        <td>改 ETA 当天改约；约仓天不与海运相加</td>
+        <td><span class="tag mid">半控</span></td>
+        <td><a href="#wh">拖车与仓库</a> · <a href="#time">时效</a></td>
+      </tr>
+      <tr class="cov-mid">
+        <td>还空</td>
+        <td>还空点不收，用箱/车架继续走</td>
+        <td>提柜≥2 天未见还空日期进日报；当天还空表/车架日租仍未接入</td>
+        <td><span class="tag mid">半控</span></td>
+        <td><a href="#dest">清关提货</a></td>
+      </tr>
+    </tbody>
+  </table>
+  </div>
+  <p class="cap">监控口径：工作日早报；差 1 天写日报；≥3 天打延误标签；LFD 代理剩≤2 天报（真 LFD 待接）。</p>
+
+  <details open>
+    <summary>节点细则：展开（风险一段 · 应对一段）</summary>
+
+  <h3>订舱</h3>
+  <div class="seg">
+    <p class="seglab">有什么风险</p>
+    <ul>
+      <li>甩柜。船公司超订，旺季改船期，或重箱晚于截港，柜子从这一水被拿掉。</li>
+      <li>亏舱费。舱订了又不用，过了取消时点，货代按违约金收。</li>
+      <li>船期。未来几周班次变稀，或这一水的船名、ETD 和已公布船期对不上。计划和预约还按旧的走。</li>
+      <li>码头。目的港码头变了，周末能不能提、要不要预约，还按旧码头排。</li>
+      <li>淡旺季看反。只看运价，会把抽船当成没货，或把涨价当成一定有舱。</li>
+    </ul>
+  </div>
+  <div class="seg">
+    <p class="seglab">怎么应对</p>
+    <ul>
+      <li>甩柜。确认上核对船名、航次、ETD、码头和四个截点。被甩当天改交付、改配下一水、问亏舱费。只有书面约定不甩才算保舱。</li>
+      <li>亏舱费。订舱时写明多久可以无责取消，能不能挪到后一水。</li>
+      <li>船期。履约中台已经爬了宁波未来船期，有船名、航次、ETD、ETA、航程，按周看洛杉矶、长滩、纽约等目的港密不密，也能按船名航次查。已填船公司是中远、长荣、东方海外、达飞、美森。某一柜的船名或 ETD 变了，计划和预约当天重算。这张是宁波已公布班次，上海开的不在里面，也不自动改这一柜的交付日。</li>
+      <li>码头。确认上写这一水的目的港码头。变了当天重算。船期表不带码头和截港。</li>
+      <li>淡旺季。运价、准班、这一水订不订得到，三样一起看。挂靠变少常常是抽船。货代说松还是紧，只作印证。</li>
+    </ul>
+  </div>
+
+  <h3>做箱</h3>
+  <div class="seg">
+    <p class="seglab">有什么风险</p>
+    <ul>
+      <li>截港前重箱进不了场，这一水就没了。</li>
+      <li>预提、落箱、加车花了钱，配载仍可能把箱子留到下一水。</li>
+    </ul>
+  </div>
+  <div class="seg">
+    <p class="seglab">怎么应对</p>
+    <ul>
+      <li>开港前可以提空、装货。重箱必须开港后、截港前进港。截港当天还没进港，当天改下一水。</li>
+      <li>官网查得到进港的是长荣、中远/东方海外、森罗。查不到的，当天看互邦、长河有没有写进港。</li>
+      <li>预提、落箱、加车只买进场。交付日等装船结果。</li>
+    </ul>
+  </div>
+
+  <h3>装柜</h3>
+  <div class="seg">
+    <p class="seglab">有什么风险</p>
+    <ul>
+      <li>错标、错货、错数、封早了。司机走了以后，到美国查验或退运才看见。</li>
+    </ul>
+  </div>
+  <div class="seg">
+    <p class="seglab">怎么应对</p>
+    <ul>
+      <li>汇一、持创按八步走。每步等群里书面确认。没有确认就往下做，费用由工厂承担。</li>
+      <li>确认不替代照片。八个确认时间现在没有系统记，靠群里有人盯。</li>
+    </ul>
+  </div>
+
+  <h3>装船</h3>
+  <div class="seg">
+    <p class="seglab">有什么风险</p>
+    <ul>
+      <li>进港、海关放行、比对通过，箱子仍可以留在堆场。</li>
+      <li>截港后加载进了闸口，不等于上了船。</li>
+    </ul>
+  </div>
+  <div class="seg">
+    <p class="seglab">怎么应对</p>
+    <ul>
+      <li>认 ATD。计划离港当天还在堆场，这一水作废，改下一水，问亏舱费。</li>
+      <li>截港被改，当天写进计划表。船司追踪能分已进港、已装船的，目前是长荣、中远/东方海外、森罗，而且晚 2 天才叫。</li>
+    </ul>
+  </div>
+
+  <h3>在途</h3>
+  <div class="seg">
+    <p class="seglab">有什么风险</p>
+    <ul>
+      <li>船晚、换船、跳港。ETA 改了一天，仓库和 FBA 的窗口还是旧的。</li>
+      <li>船开了以后再买保险，这一票保不上。一切险通常也不保延误造成的仓库空窗。</li>
+    </ul>
+  </div>
+  <div class="seg">
+    <p class="seglab">怎么应对</p>
+    <ul>
+      <li>工作日早报对船位、换船和 ETA。ETA 改一天，预约当天改。</li>
+      <li>保险在开船前买。差 1 天进当天日报；≥3 天打「延误」标签（GAP_DAYS=3）——两件事分开。</li>
+    </ul>
+  </div>
+
+  <h3>提货</h3>
+  <div class="seg">
+    <p class="seglab">有什么风险</p>
+    <ul>
+      <li>已经卸下还不能提。免费期从卸船起算，约不到，堆存继续走。</li>
+      <li>纽约 APM 约不到会把最后免费日往后挪。洛杉矶 TraPac 不会，价目继续走。</li>
+    </ul>
+  </div>
+  <div class="seg">
+    <p class="seglab">怎么应对</p>
+    <ul>
+      <li><strong>标准</strong>：卸船当天记下码头系统最后免费日；剩 2 天仍不可提或无预约，当天报。不自己用卸船日加 4 天当真 LFD。</li>
+      <li><strong>现状</strong>：日报已按「免费 4 天代理、剩≤2 天未提 → P0」；码头系统真 LFD 与预约名额仍未接入。</li>
+    </ul>
+  </div>
+
+  <h3>送仓</h3>
+  <div class="seg">
+    <p class="seglab">有什么风险</p>
+    <ul>
+      <li>海运 ETA 改了，仓库或 FBA 的预约还是订舱时的窗口。</li>
+    </ul>
+  </div>
+  <div class="seg">
+    <p class="seglab">怎么应对</p>
+    <ul>
+      <li>无忧达 ETA 和货代 ETA 对差。FBA 货件状态在日报里。</li>
+      <li>ETA 改动的当天，看这个目的仓最早还能约到哪一天。约仓按仓、按周进周一的日报，不和海运天数加在一起。</li>
+    </ul>
+  </div>
+
+  <h3>还空</h3>
+  <div class="seg">
+    <p class="seglab">有什么风险</p>
+    <ul>
+      <li>箱子已经提出，这一天的还空表不收这个船公司、这个箱型。用箱和车架继续走。</li>
+    </ul>
+  </div>
+  <div class="seg">
+    <p class="seglab">怎么应对</p>
+    <ul>
+      <li>提柜次日看还空表。不收就当天报，不等账单。</li>
+      <li>中远接口能看到还空日期；提柜后 ≥2 天字段仍空会进日报。当天还空表（收不收）和车架日租仍未接入。</li>
+    </ul>
+  </div>
+  </details>
+
+  <h3 class="hho">HHO 视角</h3>
+  <p class="hho-note">总表看覆盖；折叠细则与各 sheet 看执行。脚本已对齐：差 1 天进日报、≥3 天延误标签、LFD 代理剩≤2 天 P0；真 LFD / 还空表仍半控。</p>
+  <div class="wrap">
+  <table class="mx">
+    <thead>
+      <tr><th>潜在风险</th><th>应该怎么应对</th><th>目前怎么应对</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>代理免费期与码头真 LFD 不一致，或约不到事件日报读不到</td><td>接入码头最后免费日与预约状态；代理只作过渡</td><td>intransit_check：FREE_DAYS_ASSUME=4、LFD_WARN_REMAIN=2；carrier_track：REPORT_DRIFT_DAYS=1 与 GAP_DAYS=3 分开</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+</section>
+</main>
+
+<script>
+(function () {
+  var tabs = document.querySelectorAll(".sheets button");
+  var sheets = document.querySelectorAll(".sheet");
+  function show(id) {
+    tabs.forEach(function (b) { b.classList.toggle("on", b.getAttribute("data-sheet") === id); });
+    sheets.forEach(function (s) { s.classList.toggle("on", s.getAttribute("data-sheet") === id); });
+    try { history.replaceState(null, "", "#" + id); } catch (e) {}
+    window.scrollTo(0, 0);
+  }
+  tabs.forEach(function (b) {
+    b.addEventListener("click", function () { show(b.getAttribute("data-sheet")); });
+  });
+  var map = { risk: "risk", terms: "terms", box: "box", map: "overview", summary: "overview", book: "book", stuff: "stuff", pack: "pack", load: "load", sea: "sea", dest: "dest", wh: "wh", west: "west", east: "east", time: "time", sla: "time", lines: "book", routes: "book", late: "load", typhoon: "load", jam: "dest", overview: "overview" };
+  function applyHash() {
+    var hash = (location.hash || "").replace(/^#/, "");
+    if (map[hash]) show(map[hash]);
+  }
+  applyHash();
+  window.addEventListener("hashchange", applyHash);
+  document.querySelectorAll('a[href^="#"]').forEach(function (a) {
+    a.addEventListener("click", function () {
+      var id = (a.getAttribute("href") || "").replace(/^#/, "");
+      if (map[id]) setTimeout(function () { show(map[id]); }, 0);
+    });
+  });
+})();
+</script>
+</body>
+</html>

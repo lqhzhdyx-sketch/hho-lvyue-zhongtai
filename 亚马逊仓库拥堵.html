@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>亚马逊仓库拥堵</title>
+<style>
+  :root {
+    --bg: #f4f6f8;
+    --card: #fff;
+    --ink: #1c2430;
+    --muted: #5c6b7a;
+    --line: #e3e8ee;
+    --red: #b42318;
+    --red-bg: #fdeceb;
+    --amber: #b54708;
+    --amber-bg: #fff4e5;
+    --green: #067647;
+    --green-bg: #e8f6ee;
+    --blue: #175cd3;
+    --blue-bg: #eef4ff;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    line-height: 1.45;
+  }
+  header, main { max-width: 1120px; margin: 0 auto; padding: 20px 16px; }
+  header { padding-bottom: 0; }
+  h1 { font-size: 22px; margin: 0 0 6px; }
+  h2 { font-size: 16px; margin: 0 0 10px; }
+  .sub { color: var(--muted); font-size: 13px; }
+  .stats, .ours, .filters { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 14px; }
+  .stat, .card, .panel {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+  }
+  .stat { padding: 10px 14px; min-width: 120px; }
+  .stat b { display: block; font-size: 22px; }
+  .stat span { color: var(--muted); font-size: 12px; }
+  .stat.bad b { color: var(--red); }
+  .stat.warn b { color: var(--amber); }
+  .stat.ok b { color: var(--green); }
+  .card { padding: 12px 14px; min-width: 150px; }
+  .card .code { font-weight: 700; font-size: 16px; }
+  .card .meta { color: var(--muted); font-size: 12px; margin-top: 2px; }
+  .tag {
+    display: inline-block;
+    font-size: 12px;
+    padding: 1px 7px;
+    border-radius: 999px;
+    margin-top: 6px;
+  }
+  .tag.bad { background: var(--red-bg); color: var(--red); }
+  .tag.warn { background: var(--amber-bg); color: var(--amber); }
+  .tag.ok { background: var(--green-bg); color: var(--green); }
+  .tag.miss { background: var(--blue-bg); color: var(--blue); }
+  .filters { align-items: center; }
+  button, input {
+    font: inherit;
+    border: 1px solid var(--line);
+    background: #fff;
+    border-radius: 8px;
+    padding: 7px 12px;
+  }
+  button.active { background: var(--ink); color: #fff; border-color: var(--ink); }
+  input { min-width: 180px; }
+  .panel { padding: 14px; margin-top: 14px; }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  th, td { text-align: left; padding: 8px 8px; border-bottom: 1px solid var(--line); }
+  th { font-size: 12px; color: var(--muted); font-weight: 600; position: sticky; top: 0; background: #fff; }
+  td.num, th.num { text-align: right; }
+  tr.ours td { background: #f7faff; }
+  tr.bad td:first-child { box-shadow: inset 3px 0 0 var(--red); }
+  tr.warn td:first-child { box-shadow: inset 3px 0 0 var(--amber); }
+  .note { font-size: 13px; color: var(--muted); }
+  .grid2 { display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 12px; }
+  @media (max-width: 800px) { .grid2 { grid-template-columns: 1fr; } }
+  ul { margin: 8px 0 0; padding-left: 18px; }
+  .src { font-size: 13px; }
+  .src td { vertical-align: top; }
+</style>
+</head>
+<body>
+<header>
+  <h1>亚马逊仓库拥堵</h1>
+  <div class="sub">主表是长河周报，数据截止 2026-10-13。预约天数是约卡车还要等的天数，不含海运。</div>
+  <div class="stats" id="stats"></div>
+  <h2 style="margin-top:18px">我们在用的仓</h2>
+  <div class="ours" id="ours"></div>
+</header>
+<main>
+  <div class="filters">
+    <button type="button" data-filter="all" class="active">全部</button>
+    <button type="button" data-filter="bad">爆仓</button>
+    <button type="button" data-filter="warn">爆仓趋势</button>
+    <button type="button" data-filter="ok">正常</button>
+    <button type="button" data-filter="ours">只看我们的仓</button>
+    <input id="q" placeholder="搜仓库代码，例如 SCK8">
+  </div>
+  <div class="panel">
+    <h2>美国仓约仓天数</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>仓库</th>
+          <th>卡板</th>
+          <th class="num">卡板天数</th>
+          <th>地板</th>
+          <th class="num">地板天数</th>
+        </tr>
+      </thead>
+      <tbody id="rows"></tbody>
+    </table>
+    <p class="note" id="count"></p>
+  </div>
+
+  <div class="grid2">
+    <div class="panel">
+      <h2>我们自己的货件窗口</h2>
+      <p class="note">来源：钉钉 FBA入库，抓取 2026-10-14 07:59。这是建单到送达窗口，海运时间也算在里面，不能和上面的约仓天数相加。</p>
+      <table>
+        <thead>
+          <tr>
+            <th>仓库</th>
+            <th>最近建单</th>
+            <th>窗口开始</th>
+            <th class="num">距今天</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>PIT2</td><td>09-28</td><td>11-08</td><td class="num">25 天</td></tr>
+          <tr><td>SCK1</td><td>09-28</td><td>11-08</td><td class="num">25 天</td></tr>
+          <tr><td>SAT4</td><td>09-28</td><td>11-08</td><td class="num">25 天</td></tr>
+          <tr><td>HLI2</td><td>09-09</td><td>10-25</td><td class="num">11 天</td></tr>
+          <tr><td>YYZ9</td><td>09-16</td><td>10-25</td><td class="num">11 天</td></tr>
+          <tr><td>SCK8</td><td>10-13</td><td>10-18</td><td class="num">4 天</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="panel">
+      <h2>其他来源</h2>
+      <table class="src">
+        <tbody>
+          <tr><td>众包 10-05</td><td>打托批约：SCK8、SCK1 延迟 2 周。不是 Elite，但是逐仓表。</td></tr>
+          <tr><td>科睿 09-28</td><td>SCK8 严重、约 2 周后；SAT4 排队；PIT2、HLI2 标成常规。不在亚马逊 FIST 名单里。</td></tr>
+          <tr><td>天盛 10-05</td><td>FIST Elite。HLI2 写的是需集货，没有预约天数。</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="panel">
+    <h2>加拿大、欧洲</h2>
+    <p class="note">长河这页没有给出预约天数，只有文字。下面只保留和我们有关、以及写明了天数的几条。</p>
+    <ul>
+      <li>YYZ9：不收大件，超尺寸拒收风险高。</li>
+      <li>YYC4：收货基本正常。</li>
+      <li>YOO1、SCK1：这张周报里没有这两个仓库。</li>
+      <li>德国 DTM2：入库 3–7 天，四季度压力上升。法国 CDG7：入库 7–12 天。</li>
+      <li>英国 BHX4：入库 3–5 天，拥堵后上架约 7–10 天。LBA4：接收稳定。</li>
+    </ul>
+  </div>
+</main>
+<script>
+const OURS = new Set(["SCK8", "SAT4", "HLI2", "PIT2", "GEU2"]);
+const ROWS = [
+  ["LAX9","正常",1,"正常",3],["ONT8","爆仓趋势",8,"爆仓趋势",7],["LGB8","正常",4,"正常",3],
+  ["SBD1","正常",3,"正常",2],["POC1","爆仓趋势",8,"爆仓趋势",6],["POC2","爆仓趋势",11,"爆仓趋势",10],
+  ["POC3","爆仓趋势",8,"爆仓趋势",8],["IUSJ","正常",4,"正常",5],["IUSP","正常",3,"正常",1],
+  ["IUSW","正常",5,"正常",1],["PSP3","正常",2,"正常",4],["SBD2","爆仓趋势",10,"爆仓趋势",9],
+  ["LGB4","正常",2,"正常",3],["LGB6","正常",5,"正常",1],["GYR3","爆仓趋势",8,"爆仓趋势",9],
+  ["GYR2","爆仓趋势",9,"爆仓趋势",11],["SMF3","爆仓趋势",10,"爆仓趋势",10],
+  ["LAS1","爆仓",null,"爆仓",null],["SCK4","爆仓",null,"爆仓",null],
+  ["VGT2","爆仓",20,"爆仓",18],["MIT2","爆仓",17,"爆仓",16],["GEU3","爆仓趋势",9,"爆仓趋势",11],
+  ["GEU2","正常",3,"正常",4],["HLI2","正常",7,"正常",2],["TCY1","爆仓趋势",10,"爆仓趋势",8],
+  ["TCY2","爆仓趋势",13,"爆仓趋势",9],["SCK8","爆仓",15,"爆仓",18],["MCE1","正常",2,"正常",5],
+  ["MCC1","爆仓",17,"爆仓",16],["SMF6","爆仓趋势",13,"爆仓趋势",11],["PHX7","正常",3,"正常",1],
+  ["FAT2","爆仓",25,"爆仓",25],["OAK3","正常",1,"正常",2],["XLX7","爆仓趋势",9,"爆仓趋势",8],
+  ["SLC2","爆仓趋势",7,"爆仓趋势",10],["PDX7","爆仓趋势",10,"爆仓趋势",9],
+  ["IND9","爆仓",21,"爆仓",23],["MQJ1","爆仓",24,"爆仓",23],["MDW2","爆仓",15,"爆仓",17],
+  ["FTW1","爆仓趋势",10,"爆仓趋势",9],["IAH3","爆仓趋势",17,"爆仓趋势",15],["FTW5","爆仓",27,"爆仓",22],
+  ["DFW6","正常",3,"正常",7],["SAT1","正常",2,"正常",5],["SAT4","爆仓",21,"爆仓",20],
+  ["ABQ2","正常",5,"正常",4],["PSC2","爆仓趋势",13,"爆仓趋势",14],["DEN8","爆仓",18,"爆仓",19],
+  ["MEM1","爆仓",21,"爆仓",19],["BNA6","爆仓",20,"爆仓",22],["BNA2","正常",6,"正常",7],
+  ["CHA2","正常",3,"正常",5],["MEM8","正常",1,"正常",1],["BFI3","爆仓趋势",11,"爆仓趋势",14],
+  ["ACY2","正常",3,"正常",1],["ABE4","爆仓趋势",8,"爆仓趋势",10],["ABE8","爆仓趋势",12,"爆仓趋势",9],
+  ["PIT2","正常",5,"正常",3],["TEB3","正常",5,"正常",2],["TEB4","爆仓",17,"爆仓",15],
+  ["TEB6","爆仓趋势",10,"正常",7],["TEB9","爆仓趋势",9,"爆仓趋势",9],["XEW5","正常",4,"正常",2],
+  ["SWF1","正常",6,"正常",7],["SWF2","正常",2,"正常",1],["ALB1","正常",5,"正常",1],
+  ["AVP1","爆仓",14,"爆仓",18],["BWI4","正常",1,"正常",4],["ILG1","正常",7,"正常",5],
+  ["DCA6","爆仓趋势",9,"正常",5],["RMN3","爆仓",15,"爆仓",13],["ORF2","爆仓趋势",13,"爆仓",17],
+  ["CHO1","正常",7,"正常",5],["MDT1","正常",6,"正常",3],["MDT4","正常",2,"正常",5],
+  ["BOS7","爆仓趋势",10,"正常",8],["XRI3","正常",3,"正常",5],["CLT2","正常",5,"正常",4],
+  ["CLT3","爆仓",19,"爆仓",20],["RDU2","爆仓",15,"爆仓",16],["GSO1","正常",3,"正常",3],
+  ["XLX6","正常",3,"正常",1],["LBE1","爆仓",21,"爆仓",22],["CMH2","正常",6,"正常",8],
+  ["CMH3","正常",4,"正常",7],["XPB2","正常",3,"正常",9],["JAX3","正常",6,"正常",5],
+  ["MCO2","正常",4,"正常",6],["TPA2","正常",7,"正常",8],["TPA3","正常",1,"正常",3],
+  ["MGE3","正常",5,"正常",4],["RYY2","正常",6,"正常",6],["HGR6","爆仓趋势",10,"正常",7],
+  ["DET1","正常",5,"正常",3],["DET2","正常",4,"正常",6]
+].map(([code, pallet, palletDays, floor, floorDays]) => ({
+  code, pallet, palletDays, floor, floorDays, ours: OURS.has(code)
+}));
+
+const MISSING = [
+  ["SCK1", "本周周报没有这个仓"],
+  ["YOO1", "本周周报没有这个仓"],
+  ["YYZ9", "只有文字：不收大件"],
+  ["YYC4", "收货基本正常"]
+];
+
+function cls(status) {
+  if (status === "爆仓") return "bad";
+  if (status === "爆仓趋势") return "warn";
+  return "ok";
+}
+function days(n) { return n == null ? "pending" : n; }
+function worst(row) {
+  return row.pallet === "爆仓" || row.floor === "爆仓" ? "bad"
+    : row.pallet === "爆仓趋势" || row.floor === "爆仓趋势" ? "warn" : "ok";
+}
+
+const bad = ROWS.filter(r => worst(r) === "bad").length;
+const warn = ROWS.filter(r => worst(r) === "warn").length;
+const ok = ROWS.filter(r => worst(r) === "ok").length;
+document.getElementById("stats").innerHTML = [
+  ["bad", bad, "爆仓"],
+  ["warn", warn, "爆仓趋势"],
+  ["ok", ok, "正常"],
+  ["", ROWS.length, "美国仓"]
+].map(([c, n, label]) => `<div class="stat ${c}"><b>${n}</b><span>${label}</span></div>`).join("");
+
+document.getElementById("ours").innerHTML = ROWS.filter(r => r.ours).map(r => {
+  const c = worst(r);
+  return `<div class="card"><div class="code">${r.code}</div><div class="meta">卡板 ${days(r.palletDays)} 天 · 地板 ${days(r.floorDays)} 天</div><span class="tag ${c}">${r.pallet}</span></div>`;
+}).join("") + MISSING.map(([code, text]) =>
+  `<div class="card"><div class="code">${code}</div><div class="meta">${text}</div><span class="tag miss">未列入天数</span></div>`
+).join("");
+
+let filter = "all";
+function show() {
+  const q = document.getElementById("q").value.trim().toUpperCase();
+  const list = ROWS.filter(r => {
+    if (q && !r.code.includes(q)) return false;
+    if (filter === "ours") return r.ours;
+    if (filter === "all") return true;
+    return worst(r) === filter;
+  }).sort((a, b) => (b.palletDays ?? 99) - (a.palletDays ?? 99));
+  document.getElementById("rows").innerHTML = list.map(r =>
+    `<tr class="${worst(r)} ${r.ours ? "ours" : ""}"><td>${r.code}${r.ours ? " · 我们的仓" : ""}</td><td>${r.pallet}</td><td class="num">${days(r.palletDays)}</td><td>${r.floor}</td><td class="num">${days(r.floorDays)}</td></tr>`
+  ).join("");
+  document.getElementById("count").textContent = `显示 ${list.length} 个仓。红字爆仓含 pending。数字从长河周报图片录入，和原图不一致时以原图为准。`;
+}
+document.querySelectorAll("button[data-filter]").forEach(btn => {
+  btn.addEventListener("click", () => {
+    filter = btn.dataset.filter;
+    document.querySelectorAll("button[data-filter]").forEach(b => b.classList.toggle("active", b === btn));
+    show();
+  });
+});
+document.getElementById("q").addEventListener("input", show);
+show();
+</script>
+</body>
+</html>
