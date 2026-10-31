@@ -43,6 +43,15 @@
   tr.cov-ok td:first-child { box-shadow:inset 3px 0 0 #047857; }
   tr.cov-mid td:first-child { box-shadow:inset 3px 0 0 #b45309; }
   tr.cov-gap td:first-child { box-shadow:inset 3px 0 0 #b91c1c; }
+  .lamp { display:inline-block; font-size:11px; font-weight:650; padding:2px 8px; border-radius:999px; white-space:nowrap; }
+  .lamp.red { background:#fef2f2; color:#b91c1c; }
+  .lamp.yellow { background:#fffbeb; color:#b45309; }
+  .lamp.blue { background:#dbeafe; color:#1d4ed8; }
+  .lamp.gray { background:#f5f5f4; color:#57534e; }
+  table.portafter { font-size:12px; }
+  table.portafter th { color:#57534e; font-weight:600; font-size:11px; background:#fafaf9; }
+  .port-stats { display:flex; flex-wrap:wrap; gap:8px; margin:0 0 10px; }
+  .port-stats span { border:1px solid #e7e5e4; background:#fff; border-radius:999px; padding:4px 10px; font-size:12px; }
   .legend { display:flex; gap:16px; margin:0 0 8px; font-size:14px; }
   .sw { display:inline-block; width:18px; height:3px; margin-right:6px; vertical-align:middle; }
   svg { width:100%; height:auto; }
@@ -235,12 +244,13 @@
 <body>
 <main>
   <h1>履约中台</h1>
-  <p class="sub">五个板块。页面只读，不改底稿。价格按月看方向；北美头程控制点嵌在「内部风险」一张表里。</p>
+  <p class="sub">六个板块。页面只读，不改底稿。价格按月看方向；到港后专项盯卸货/提柜/还空/送仓。</p>
   <nav id="tabs">
     <button type="button" class="on" data-tab="price">海运价格</button>
     <button type="button" data-tab="ship">航运情况</button>
     <button type="button" data-tab="supply">供需</button>
     <button type="button" data-tab="flow">进度</button>
+    <button type="button" data-tab="port">到港后</button>
     <button type="button" data-tab="risk">内部风险</button>
   </nav>
 
@@ -413,6 +423,46 @@
     <div class="lanes"><div class="col" id="flow-unknown"><h3>位置不明 <span>4</span></h3><div class="chip" data-id="TGBU4098919" data-country="加拿大" data-dest="亚马逊加拿大" data-goods="小壹猫厕所-灰色"><b>亚马逊加拿大</b> TGBU4098919<small>小壹猫厕所-灰色 · De-ramp at Final Hub · 预计 10/19</small></div><div class="chip" data-id="TIIU5291428" data-country="日本" data-dest="圆通日本" data-goods="小壹垃圾袋、三防垫"><b>圆通日本</b> TIIU5291428<small>小壹垃圾袋、三防垫 · 未填状态 · 预计 —</small></div><div class="chip hot" data-id="HAMU2600122" data-country="美国" data-dest="无忧达美西" data-goods="猫厕所-小壹-黑色"><b>无忧达美西</b> HAMU2600122<small>猫厕所-小壹-黑色 · 未填状态 · 预计 —</small></div><div class="chip" data-id="CSNU6592951" data-country="美国" data-dest="易达云美西" data-goods="汇一猫厕所-黑色"><b>易达云美西</b> CSNU6592951<small>汇一猫厕所-黑色 · 未填状态 · 预计 —</small></div></div></div>
   </section>
 
+  <section id="port" hidden>
+    <h2>到港后追踪</h2>
+    <p class="read">全部已到港/已卸船柜子：卸货、提柜、还空、送仓一眼看完。</p>
+    <p class="sub">到港后 7 柜｜红 5｜黄 2｜蓝 0｜灰 0。口径：到港→提柜 ≤3 天；提柜→送仓 ≤3 天。卸货/提柜/还空认船司；送仓认货代实际派送/签收完结。 提柜不明标黄。细则与头程控制见「内部风险」。</p>
+    <div class="port-stats">
+      <span>红·超线 <b>5</b></span>
+      <span>黄·临近/不明 <b>2</b></span>
+      <span>蓝·在控 <b>0</b></span>
+      <span>灰·未齐 <b>0</b></span>
+    </div>
+    <div class="tools">
+      <select id="port-lamp">
+        <option value="全部">全部灯色</option>
+        <option value="red">只看红</option>
+        <option value="yellow">只看黄</option>
+        <option value="blue">只看蓝</option>
+        <option value="gray">只看灰</option>
+      </select>
+      <input id="port-q" type="search" placeholder="柜号">
+    </div>
+    <div class="panel" style="overflow:auto">
+      <table class="portafter">
+        <thead>
+          <tr>
+            <th>柜号</th><th>到港</th><th>卸货</th><th>提柜</th><th>还空</th><th>送仓</th>
+            <th>提柜灯（≤3天）</th><th>送仓灯（提柜后再≤3天）</th><th>总灯</th>
+          </tr>
+        </thead>
+        <tbody id="port-body"><tr class='port-row' data-lamp='red' data-cab='CAAU8718360'><td><b>CAAU8718360</b><div class='lane'>长河｜亚马逊加拿大｜SM Line</div></td><td>10/9</td><td>是</td><td>是<div class='lane'>10/18</div></td><td>是<div class='lane'>10/30</div></td><td>否<div class='lane'>—</div></td><td><span class="lamp red">用了9天（超3）</span></td><td><span class="lamp red">已13天未完成</span></td><td><span class="lamp red">红·超线</span></td></tr>
+<tr class='port-row' data-lamp='red' data-cab='EGHU9679472'><td><b>EGHU9679472</b><div class='lane'>长河｜易达云美西｜长荣</div></td><td>10/23</td><td>是</td><td>是<div class='lane'>10/30</div></td><td>否<div class='lane'>—</div></td><td>否<div class='lane'>—</div></td><td><span class="lamp red">用了7天（超3）</span></td><td><span class="lamp blue">已1天</span></td><td><span class="lamp red">红·超线</span></td></tr>
+<tr class='port-row' data-lamp='red' data-cab='GAOU6310051'><td><b>GAOU6310051</b><div class='lane'>互邦｜亚马逊FBA｜长荣</div></td><td>10/23</td><td>是</td><td>是<div class='lane'>10/28</div></td><td>否<div class='lane'>—</div></td><td>否<div class='lane'>—</div></td><td><span class="lamp red">用了5天（超3）</span></td><td><span class="lamp red">已3天未完成</span></td><td><span class="lamp red">红·超线</span></td></tr>
+<tr class='port-row' data-lamp='red' data-cab='CBHU9161477'><td><b>CBHU9161477</b><div class='lane'>长河｜无忧达美东｜中远/东方海外</div></td><td>10/24</td><td>是</td><td>是<div class='lane'>10/29</div></td><td>否<div class='lane'>—</div></td><td>否<div class='lane'>—</div></td><td><span class="lamp red">用了5天（超3）</span></td><td><span class="lamp yellow">已2天</span></td><td><span class="lamp red">红·超线</span></td></tr>
+<tr class='port-row' data-lamp='red' data-cab='CSNU8463085'><td><b>CSNU8463085</b><div class='lane'>互邦｜无忧达欧洲｜中远/东方海外</div></td><td>—</td><td>是</td><td>是<div class='lane'>10/22</div></td><td>是<div class='lane'>10/22</div></td><td>否<div class='lane'>—</div></td><td><span class="lamp blue">已提（无到港日）</span></td><td><span class="lamp red">已9天未完成</span></td><td><span class="lamp red">红·超线</span></td></tr>
+<tr class='port-row' data-lamp='yellow' data-cab='TGBU4098919'><td><b>TGBU4098919</b><div class='lane'>长河｜亚马逊加拿大｜中远/东方海外</div></td><td>10/19</td><td>是</td><td>不明<div class='lane'>不能判断（船司状态是De-ramp at Final H</div></td><td>否<div class='lane'>—</div></td><td>否<div class='lane'>—</div></td><td><span class="lamp yellow">提柜不明</span></td><td><span class="lamp gray">未起算（未提柜）</span></td><td><span class="lamp yellow">黄·临近</span></td></tr>
+<tr class='port-row' data-lamp='yellow' data-cab='SMCU1287302'><td><b>SMCU1287302</b><div class='lane'>长河｜无忧达美西｜SM Line</div></td><td>10/27</td><td>是</td><td>不明<div class='lane'>尚未卸船（当前已进港）</div></td><td>否<div class='lane'>—</div></td><td>否<div class='lane'>—</div></td><td><span class="lamp yellow">提柜不明</span></td><td><span class="lamp gray">未起算（未提柜）</span></td><td><span class="lamp yellow">黄·临近</span></td></tr></tbody>
+      </table>
+    </div>
+    <p class="note">红=超线未完成或完成已超；黄=满2天临近或提柜不明；蓝=在控；灰=送仓未起算（还没提柜）。送仓目前接货代「实际派送/签收完结」，无忧达预约字段下一轮再并。</p>
+  </section>
+
   <section id="risk" hidden>
     <div class="banner">内部风险按在途日报 10/31 更新，数据时间 2026-10-31 09:33。P0 是今天处理，P1 是本周处理。</div>
     <p class="meta">在途 25 票｜P0 0 票｜P1 20 票｜今日运行正常</p>
@@ -467,6 +517,22 @@ document.getElementById("tabs").addEventListener("click", function (ev) {
     sections[j].hidden = sections[j].id !== name;
   }
 });
+function portApply() {
+  var lamp = (document.getElementById("port-lamp") || {}).value || "全部";
+  var q = ((document.getElementById("port-q") || {}).value || "").trim().toUpperCase();
+  var rows = document.querySelectorAll("#port-body tr.port-row");
+  for (var i = 0; i < rows.length; i++) {
+    var el = rows[i];
+    var okLamp = lamp === "全部" || el.getAttribute("data-lamp") === lamp;
+    var cab = (el.getAttribute("data-cab") || "").toUpperCase();
+    var okQ = !q || cab.indexOf(q) >= 0 || (el.textContent || "").toUpperCase().indexOf(q) >= 0;
+    el.style.display = okLamp && okQ ? "" : "none";
+  }
+}
+var portLamp = document.getElementById("port-lamp");
+var portQ = document.getElementById("port-q");
+if (portLamp) portLamp.addEventListener("change", portApply);
+if (portQ) portQ.addEventListener("input", portApply);
 function fieldHit(el, attr, value) {
   if (value === "全部") return true;
   var raw = el.getAttribute(attr) || "";
